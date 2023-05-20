@@ -1,3 +1,4 @@
+import { OptionsAccessor } from "src/options-accessor";
 
 export interface BaseFieldOptions {
     required?: boolean;
@@ -5,11 +6,24 @@ export interface BaseFieldOptions {
     readOnly?: boolean;
     writeOnly?: boolean;
     source?: string;
+    default?: any;
 }
 
-export class BaseField {
+export const BaseFieldDefaults = {
+    required: true,
+    allowNull: false,
+    source: '',
+    readOnly: false,
+    writeOnly: false,
+    default: undefined
+};
 
-    constructor(options: BaseFieldOptions) { }
+export class BaseField {
+    protected options: OptionsAccessor<BaseFieldOptions>;
+
+    constructor(options: BaseFieldOptions) {
+        this.options = new OptionsAccessor<BaseFieldOptions>(options, BaseFieldDefaults);
+    }
 
     public getValueToParse(rawData: any) {
 
@@ -43,6 +57,5 @@ export class BaseField {
         ReturnType<InstanceType<T>['parse']> {
         return new this(args as any) as any;
     }
-
 
 }

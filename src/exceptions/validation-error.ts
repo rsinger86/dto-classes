@@ -1,17 +1,11 @@
-export class ValidationError<T = any> extends Error {
+import { ValidationIssue } from "./validation-issue";
+
+export class ValidationError extends Error {
     issues: any[] = [];
 
 
-    constructor(issues: any[]) {
-        super();
-
-        const actualProto = new.target.prototype;
-        if (Object.setPrototypeOf) {
-            // eslint-disable-next-line ban/ban
-            Object.setPrototypeOf(this, actualProto);
-        } else {
-            (this as any).__proto__ = actualProto;
-        }
+    constructor(issues: ValidationIssue[]) {
+        super(issues.map(x => x.message).join(' '));
         this.name = "ValidationError";
         this.issues = issues;
     }
