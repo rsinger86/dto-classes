@@ -11,7 +11,7 @@ export class EmailField<T extends StringFieldOptions> extends StringField {
         const issues: ValidationIssue[] = [];
         value = super.parse(value);
 
-        if (value !== null && value.trim().length > 0) {
+        if (value !== null) {
             let strValue: string = value;
             if (!REGEX_PATTERNS.EMAIL.test(strValue)) {
                 issues.push(new ValidationIssue('Not a valid email address.'))
