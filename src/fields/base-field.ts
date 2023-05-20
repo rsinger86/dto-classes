@@ -1,4 +1,4 @@
-import { OptionsAccessor } from "src/options-accessor";
+import { OptionsAccessor } from "../options-accessor";
 
 export interface BaseFieldOptions {
     required?: boolean;
@@ -19,18 +19,38 @@ export const BaseFieldDefaults = {
 };
 
 export class BaseField {
-    protected options: OptionsAccessor<BaseFieldOptions>;
+    public options: OptionsAccessor<BaseFieldOptions>;
+    private _parent: BaseField;
+    private _fieldName: string;
 
-    constructor(options: BaseFieldOptions) {
+    constructor(options: BaseFieldOptions = {}) {
         this.options = new OptionsAccessor<BaseFieldOptions>(options, BaseFieldDefaults);
     }
 
-    public getValueToParse(rawData: any) {
+    public clone() {
+        const ThisClass = this.constructor as any;
+        return new ThisClass(this.options.getRaw());
+    }
 
+    public asChild(parent: BaseField, fieldName: string) {
+        this._parent = parent;
+        this._fieldName = fieldName;
+    }
+
+    get name(): string {
+        return this._fieldName;
+    }
+
+    get parent(): BaseField {
+        return this._parent;
+    }
+
+    public getValueToParse(rawData: any, fieldName: string) {
+        return rawData;
     }
 
     public getValueToFormat(internalObject: any) {
-
+        return internalObject;
     }
 
     public parse(value: any) {
@@ -46,7 +66,7 @@ export class BaseField {
         C extends ConstructorParameters<T>[0]
     >(
         this: T,
-        args: C
+        args?: C
     ):
         C extends { required: false, allowNull: true } ?
         ReturnType<InstanceType<T>['parse']> | undefined | null :
@@ -55,7 +75,7 @@ export class BaseField {
         C extends { required: false } ?
         ReturnType<InstanceType<T>['parse']> | undefined :
         ReturnType<InstanceType<T>['parse']> {
-        return new this(args as any) as any;
+        return new this(args ?? {} as any) as any;
     }
 
 }

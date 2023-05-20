@@ -14,4 +14,9 @@ export class OptionsAccessor<T extends { [key: string]: any }> {
 
         return this._defaults[key] as any;
     }
+
+    getRaw() {
+        return this._options;
+    }
+
 }

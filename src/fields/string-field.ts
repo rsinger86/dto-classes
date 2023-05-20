@@ -1,8 +1,8 @@
 import { ValidationError } from "../exceptions/validation-error";
 import { BaseField, BaseFieldDefaults, BaseFieldOptions } from "./base-field";
 import { ValidationIssue } from "../exceptions/validation-issue";
-import { ParseReturnType } from "src/types";
-import { OptionsAccessor } from "src/options-accessor";
+import { OptionsAccessor } from "../options-accessor";
+import { ParseReturnType } from "../types";
 
 
 export interface StringFieldOptions extends BaseFieldOptions {
@@ -15,7 +15,7 @@ export interface StringFieldOptions extends BaseFieldOptions {
 }
 
 export class StringField<T extends StringFieldOptions = StringFieldOptions> extends BaseField {
-    protected options: OptionsAccessor<StringFieldOptions>;
+    public options: OptionsAccessor<StringFieldOptions>;
 
     constructor(options: T) {
         super(options);

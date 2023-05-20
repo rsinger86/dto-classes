@@ -1,8 +1,8 @@
-import { ParseReturnType } from "src/types";
+import { ParseReturnType } from "../types";
+import { ValidationIssue } from "../exceptions/validation-issue";
 import { StringField, StringFieldOptions } from "./string-field";
-import { REGEX_PATTERNS } from "src/regex";
-import { ValidationIssue } from "src/exceptions/validation-issue";
-import { ValidationError } from "src/exceptions/validation-error";
+import { REGEX_PATTERNS } from "../regex";
+import { ValidationError } from "../exceptions/validation-error";
 
 
 
@@ -11,7 +11,7 @@ export class EmailField<T extends StringFieldOptions> extends StringField {
         const issues: ValidationIssue[] = [];
         value = super.parse(value);
 
-        if (value !== null) {
+        if (value !== null && value.length > 0) {
             let strValue: string = value;
             if (!REGEX_PATTERNS.EMAIL.test(strValue)) {
                 issues.push(new ValidationIssue('Not a valid email address.'))
