@@ -8,8 +8,8 @@ export class DTObject extends BaseField {
     public options: OptionsAccessor<BaseFieldOptions>;
     private _fields: Array<BaseField | DTObject> = [];
 
-    constructor(options: BaseFieldOptions) {
-        super(options);
+    constructor(options?: BaseFieldOptions) {
+        super(options ?? {});
     }
 
     private get allFields(): Array<BaseField | DTObject> {
@@ -20,6 +20,10 @@ export class DTObject extends BaseField {
         const fields: Array<BaseField | DTObject> = []
 
         for (const attrName of Object.keys(this)) {
+            if (attrName === '_parent') {
+                continue;
+            }
+
             const attribute = this[attrName];
 
             if (attribute instanceof BaseField) {
@@ -39,17 +43,18 @@ export class DTObject extends BaseField {
     }
 
     public parse(rawObject: object): this {
-        const errors = [];
+        const errors: ValidationError[] = [];
 
         for (const field of this.getFieldsToParse()) {
-            const rawValue = rawObject[field.name] ?? null;
+            const rawValue = rawObject ? rawObject[field.name] : undefined;
 
             try {
                 this[field.name] = field.parse(rawValue)
             } catch (e) {
                 this[field.name] = undefined;
                 if (e instanceof ValidationError) {
-                    errors.push()
+                    e.addParentPath(field.name);
+                    errors.push(e)
                 } else {
                     throw e;
                 }
@@ -57,11 +62,10 @@ export class DTObject extends BaseField {
         }
 
         if (errors.length > 0) {
+            throw ValidationError.combine(errors);
         }
 
         return this;
     }
-
-
 
 }

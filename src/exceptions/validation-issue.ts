@@ -1,8 +1,13 @@
 export class ValidationIssue {
     public readonly message: string;
+    public path: string[] = [];
 
     constructor(message: string) {
         this.message = message
+    }
+
+    public addParentPath(path: string) {
+        this.path.unshift(path)
     }
 }
 

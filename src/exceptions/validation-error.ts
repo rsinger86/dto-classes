@@ -1,13 +1,30 @@
 import { ValidationIssue } from "./validation-issue";
 
 export class ValidationError extends Error {
-    issues: any[] = [];
-
+    issues: ValidationIssue[] = [];
 
     constructor(issues: ValidationIssue[]) {
         super(issues.map(x => x.message).join(' '));
         this.name = "ValidationError";
         this.issues = issues;
+    }
+
+    addParentPath(path: string) {
+        for (const issue of this.issues) {
+            issue.addParentPath(path);
+        }
+    }
+
+    public static combine(errors: ValidationError[]) {
+        let allIssues: ValidationIssue[] = [];
+
+        for (const error of errors) {
+            for (const issue of error.issues) {
+                allIssues.push(issue);
+            }
+        }
+
+        return new ValidationError(allIssues);
     }
 }
 
