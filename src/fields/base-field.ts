@@ -1,3 +1,4 @@
+import { ValidationIssue } from "../exceptions/validation-issue";
 import { OptionsAccessor } from "../options-accessor";
 
 export interface BaseFieldOptions {
@@ -51,6 +52,12 @@ export class BaseField {
 
     public getValueToFormat(internalObject: any) {
         return internalObject;
+    }
+
+    public throwIfNullAndNotAllowed(value: any) {
+        if (value === null && !this.options.get('allowNull')) {
+            throw new ValidationIssue('This field may not be null.');
+        }
     }
 
     public parse(value: any) {

@@ -17,9 +17,9 @@ export interface StringFieldOptions extends BaseFieldOptions {
 export class StringField<T extends StringFieldOptions = StringFieldOptions> extends BaseField {
     public options: OptionsAccessor<StringFieldOptions>;
 
-    constructor(options: T) {
+    constructor(options?: T) {
         super(options);
-        this.options = new OptionsAccessor<StringFieldOptions>(options, {
+        this.options = new OptionsAccessor<StringFieldOptions>(options ?? {}, {
             allowBlank: false,
             trimWhitespace: true,
             maxLength: null,
