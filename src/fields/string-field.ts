@@ -1,11 +1,11 @@
 import { ValidationError } from "../exceptions/validation-error";
 import { BaseField, BaseFieldDefaults, BaseFieldOptions } from "./base-field";
-import { ValidationIssue } from "../exceptions/validation-issue";
 import { OptionsAccessor } from "../options-accessor";
 import { ParseReturnType } from "../types";
+import { validate } from "../decorators";
 
 
-export interface StringFieldOptions extends BaseFieldOptions {
+export interface StringOptions extends BaseFieldOptions {
     allowBlank?: boolean;
     trimWhitespace?: boolean;
     maxLength?: number | null;
@@ -14,12 +14,12 @@ export interface StringFieldOptions extends BaseFieldOptions {
     toLower?: boolean;
 }
 
-export class StringField<T extends StringFieldOptions = StringFieldOptions> extends BaseField {
-    public options: OptionsAccessor<StringFieldOptions>;
+export class StringField<T extends StringOptions = StringOptions> extends BaseField {
+    public options: OptionsAccessor<StringOptions>;
 
     constructor(options?: T) {
         super(options);
-        this.options = new OptionsAccessor<StringFieldOptions>(options ?? {}, {
+        this.options = new OptionsAccessor<StringOptions>(options ?? {}, {
             allowBlank: false,
             trimWhitespace: true,
             maxLength: null,
@@ -31,47 +31,16 @@ export class StringField<T extends StringFieldOptions = StringFieldOptions> exte
     }
 
     public parse(value: any): ParseReturnType<string, T> {
-        const issues: ValidationIssue[] = [];
-
-        if (value === null) {
-            if (!this.options.get('allowNull')) {
-                issues.push(new ValidationIssue('This field may not be null.'))
-            } else {
-                return null as any;
-            }
-        }
-
         const validTypes = ['number', 'string'];
 
         if (!validTypes.includes(typeof value)) {
-            issues.push(new ValidationIssue('Not a valid string.'))
+            throw new ValidationError('Not a valid string.');
         }
 
-        if (issues.length === 0) {
-            value = String(value) as string;
+        value = String(value) as string;
 
-            if (this.options.get('trimWhitespace')) {
-                value = value.trim();
-            }
-
-            if (!this.options.get('allowBlank') && value.length === 0) {
-                issues.push(new ValidationIssue('This field may not be blank.'))
-            }
-
-            const minLen = this.options.get('minLength');
-            const maxLength = this.options.get('maxLength');
-
-            if (minLen !== null && value.length < minLen) {
-                issues.push(new ValidationIssue(`Ensure this field has at least ${minLen} characters.`))
-            }
-
-            if (maxLength !== null && value.length > maxLength) {
-                issues.push(new ValidationIssue(`Ensure this field has no more than ${maxLength} characters.`))
-            }
-        }
-
-        if (issues.length > 0) {
-            throw new ValidationError(issues);
+        if (this.options.get('trimWhitespace')) {
+            value = value.trim();
         }
 
         return value;
@@ -79,6 +48,37 @@ export class StringField<T extends StringFieldOptions = StringFieldOptions> exte
 
     public async parseAsync(value: any): Promise<ParseReturnType<string, T>> {
         return await this.parse(value);
+    }
+
+    @validate({ receieveNull: false })
+    public validateBlankness(value: string) {
+        if (!this.options.get('allowBlank') && value.length === 0) {
+            throw new ValidationError('This field may not be blank.');
+        }
+
+        return value;
+    }
+
+    @validate({ receieveNull: false })
+    public validateMinLength(value: string) {
+        const minLen = this.options.get('minLength');
+
+        if (minLen !== null && value.length < minLen) {
+            throw new ValidationError(`Ensure this field has at least ${minLen} characters.`)
+        }
+
+        return value;
+    }
+
+    @validate({ receieveNull: false })
+    public validateMaxLength(value: string) {
+        const maxLength = this.options.get('maxLength');
+
+        if (maxLength !== null && value.length > maxLength) {
+            throw new ValidationError(`Ensure this field has no more than ${maxLength} characters.`)
+        }
+
+        return value;
     }
 
     public format(value: any): string {

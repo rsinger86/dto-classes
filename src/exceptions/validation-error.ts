@@ -3,7 +3,10 @@ import { ValidationIssue } from "./validation-issue";
 export class ValidationError extends Error {
     issues: ValidationIssue[] = [];
 
-    constructor(issues: ValidationIssue[]) {
+    constructor(issues: ValidationIssue[] | string) {
+        if (typeof issues === 'string') {
+            issues = [new ValidationIssue(issues)]
+        }
         super(issues.map(x => x.message).join(' '));
         this.name = "ValidationError";
         this.issues = issues;

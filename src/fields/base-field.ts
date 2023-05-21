@@ -1,5 +1,9 @@
+import { getAllPropertyNames } from "../utils";
+import { ValidationError } from "../exceptions/validation-error";
 import { ValidationIssue } from "../exceptions/validation-issue";
 import { OptionsAccessor } from "../options-accessor";
+import { ValidateMethodOptions } from "../decorators";
+
 
 export interface BaseFieldOptions {
     required?: boolean;
@@ -19,13 +23,27 @@ export const BaseFieldDefaults = {
     default: undefined
 };
 
-export class BaseField {
+
+
+export class BaseField<T extends BaseFieldOptions = BaseFieldOptions>  {
     public options: OptionsAccessor<BaseFieldOptions>;
     private _parent: BaseField;
     private _fieldName: string;
 
     constructor(options: BaseFieldOptions = {}) {
         this.options = new OptionsAccessor<BaseFieldOptions>(options, BaseFieldDefaults);
+        const originalParse = this.parse;
+
+        this.parse = (value) => {
+            value = this.beforeParse(value);
+
+            if (value !== null && value !== undefined) {
+                value = originalParse.apply(this, [value]);
+            }
+
+            value = this.afterParse(value);
+            return value;
+        };
     }
 
     public clone() {
@@ -42,7 +60,7 @@ export class BaseField {
         return this._fieldName;
     }
 
-    get parent(): BaseField {
+    public getParent(): BaseField {
         return this._parent;
     }
 
@@ -54,18 +72,63 @@ export class BaseField {
         return internalObject;
     }
 
-    public throwIfNullAndNotAllowed(value: any) {
+    protected validatePossibleNullValue(value: any) {
         if (value === null && !this.options.get('allowNull')) {
-            throw new ValidationIssue('This field may not be null.');
+            throw new ValidationError([new ValidationIssue('This field may not be null.')]);
         }
+
+        return value;
     }
 
-    public parse(value: any) {
+    public beforeParse(value: any) {
+        value = this.validatePossibleNullValue(value);
 
+        for (const propName of getAllPropertyNames(this)) {
+            const property = this[propName]
+
+            if (!property || !property['__isPreparser']) {
+                continue;
+            }
+
+            const validateMethod = property;
+            value = validateMethod.apply(this, [value])
+        }
+
+        return value;
+
+    }
+
+    public parse(value: NonNullable<any>) {
+        return value;
+    }
+
+    public afterParse(value: string) {
+        for (const propName of getAllPropertyNames(this)) {
+            const property = this[propName]
+
+            if (!property || !property['__isValidator']) {
+                continue;
+            }
+
+            const options: ValidateMethodOptions = property['__ValidatorOptions'];
+            const validateMethod = property;
+            const isNull = value === null;
+            const isEmpty = (value === '' || value === null || value === undefined);
+
+            if (isEmpty && options.receiveEmpty === false) {
+                continue;
+            } else if (isNull && options.receieveNull === false) {
+                continue;
+            }
+
+            value = validateMethod.apply(this, [value]);
+        }
+
+        return value;
     }
 
     public format(value: any) {
-
+        return value;
     }
 
     static bind<

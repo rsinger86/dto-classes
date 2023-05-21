@@ -1,25 +1,15 @@
-import { ParseReturnType } from "src/types";
-import { StringField, StringFieldOptions } from "./string-field";
-import { ValidationIssue } from "src/exceptions/validation-issue";
+import { StringField } from "./string-field";
 import { ValidationError } from "src/exceptions/validation-error";
 import { REGEX_PATTERNS } from "src/regex";
+import { validate } from "../decorators";
 
 
-export class UrlField<T extends StringFieldOptions> extends StringField {
-    public parse(value: any): ParseReturnType<string, T> {
-        const issues: ValidationIssue[] = [];
-        value = super.parse(value);
+export class UrlField extends StringField {
 
-        if (value !== null) {
-            let strValue: string = value;
-
-            if (!REGEX_PATTERNS.HTTP_URL.test(strValue)) {
-                issues.push(new ValidationIssue('This value is not a valid URL.'))
-            }
-        }
-
-        if (issues.length > 0) {
-            throw new ValidationError(issues);
+    @validate({ receiveEmpty: false })
+    public validateUrlPattern(value: string) {
+        if (!REGEX_PATTERNS.HTTP_URL.test(value)) {
+            throw new ValidationError('This value is not a valid URL.')
         }
 
         return value;

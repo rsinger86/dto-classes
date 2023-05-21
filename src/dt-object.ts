@@ -1,6 +1,6 @@
-import { ValidationError } from "../exceptions/validation-error";
-import { OptionsAccessor } from "../options-accessor";
-import { BaseField, BaseFieldOptions } from "./base-field";
+import { ValidationError } from "./exceptions/validation-error";
+import { OptionsAccessor } from "./options-accessor";
+import { BaseField, BaseFieldOptions } from "./fields/base-field";
 
 
 
@@ -32,6 +32,7 @@ export class DTObject extends BaseField {
                 fields.push(clonedField)
             }
         }
+
         this._fields = fields;
         return this._fields;
     }

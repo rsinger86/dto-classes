@@ -21,8 +21,6 @@ export class NumberField<T extends NumberFieldOptions = NumberFieldOptions> exte
     }
 
     public parse(value: any): ParseReturnType<string, T> {
-        this.throwIfNullAndNotAllowed(value);
-
         if (typeof value === 'string' && /^\d+/.test(value)) {
             value = parseInt(value);
         } else if (typeof value === 'string' && /^[+-]?\d+(\.\d+)?$/.test(value)) {
@@ -30,7 +28,7 @@ export class NumberField<T extends NumberFieldOptions = NumberFieldOptions> exte
         } else if (typeof value === 'number') {
             value = value;
         } else {
-            throw new ValidationIssue('Invalud number passed.');
+            throw new ValidationIssue('Invalid number passed.');
         }
 
         return value;

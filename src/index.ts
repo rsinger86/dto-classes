@@ -1,9 +1,9 @@
-import { DTObject } from "./fields/dt-object";
+import { DTObject } from "./dt-object";
 import { EmailField } from "./fields/email-field";
 import { StringField } from "./fields/string-field";
 
 
-class AddressDTO extends DTObject {
+/* class AddressDTO extends DTObject {
     street = StringField.bind()
 }
 
@@ -14,8 +14,11 @@ class PersonDTO extends DTObject {
 }
 
 const person = new PersonDTO()
+ */
+var s = new EmailField()
+s.parse('r@hotmailf.com')
 
-try {
+/* try {
     person.parse({
         firstName: 'Robert',
         lastName: 'Singer',
@@ -31,3 +34,4 @@ try {
 console.log(person.firstName)
 console.log(person.email)
 console.log(person.address.street)
+ */

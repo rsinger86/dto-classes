@@ -1,12 +1,12 @@
 import { ParseReturnType } from "src/types";
-import { StringField, StringFieldOptions } from "./string-field";
+import { StringField, StringOptions } from "./string-field";
 import { ValidationIssue } from "src/exceptions/validation-issue";
 import { ValidationError } from "src/exceptions/validation-error";
 import { BaseFieldDefaults } from "./base-field";
 import { OptionsAccessor } from "../options-accessor";
 
 
-export interface RegexFieldOptions extends StringFieldOptions {
+export interface RegexFieldOptions extends StringOptions {
     pattern: RegExp
 }
 

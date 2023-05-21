@@ -6,18 +6,18 @@ import { ValidationError } from "../exceptions/validation-error";
 
 
 
-export interface ArrayFieldOptions extends BaseFieldOptions {
+export interface ArrayOptions extends BaseFieldOptions {
     item: BaseField
     maxLength?: number | null;
     minLength?: number | null;
 }
 
-export class ArrayField<T extends ArrayFieldOptions = ArrayFieldOptions> extends BaseField {
-    public options: OptionsAccessor<ArrayFieldOptions>;
+export class ArrayField<T extends ArrayOptions = ArrayOptions> extends BaseField {
+    public options: OptionsAccessor<ArrayOptions>;
 
     constructor(options: T) {
         super(options);
-        this.options = new OptionsAccessor<ArrayFieldOptions>(options, {
+        this.options = new OptionsAccessor<ArrayOptions>(options, {
             maxLength: null,
             minLength: null,
             item: null as any,
@@ -26,7 +26,6 @@ export class ArrayField<T extends ArrayFieldOptions = ArrayFieldOptions> extends
     }
 
     public parse(value: any): ParseReturnType<Array<T['item']>, T> {
-        this.throwIfNullAndNotAllowed(value);
         const parsedItems: any[] = [];
         const itemField = this.options.get('item') as BaseField;
 

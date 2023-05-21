@@ -1,6 +1,6 @@
 import { DTObject } from "./dt-object";
-import { EmailField } from "./email-field";
-import { StringField } from "./string-field";
+import { EmailField } from "./fields/email-field";
+import { StringField } from "./fields/string-field";
 
 describe('test', () => {
     test('should allow blank', async () => {
