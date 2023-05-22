@@ -2,7 +2,7 @@ import { ValidationError } from "../exceptions/validation-error";
 import { BaseField, BaseFieldDefaults, BaseFieldOptions } from "./base-field";
 import { OptionsAccessor } from "../options-accessor";
 import { ParseReturnType } from "../types";
-import { validate } from "../decorators";
+import { AfterParse } from "../decorators";
 
 
 export interface StringOptions extends BaseFieldOptions {
@@ -50,7 +50,7 @@ export class StringField<T extends StringOptions = StringOptions> extends BaseFi
         return await this.parse(value);
     }
 
-    @validate({ receieveNull: false })
+    @AfterParse({ receieveNull: false })
     public validateBlankness(value: string) {
         if (!this.options.get('allowBlank') && value.length === 0) {
             throw new ValidationError('This field may not be blank.');
@@ -59,7 +59,7 @@ export class StringField<T extends StringOptions = StringOptions> extends BaseFi
         return value;
     }
 
-    @validate({ receieveNull: false })
+    @AfterParse({ receieveNull: false })
     public validateMinLength(value: string) {
         const minLen = this.options.get('minLength');
 
@@ -70,7 +70,7 @@ export class StringField<T extends StringOptions = StringOptions> extends BaseFi
         return value;
     }
 
-    @validate({ receieveNull: false })
+    @AfterParse({ receieveNull: false })
     public validateMaxLength(value: string) {
         const maxLength = this.options.get('maxLength');
 

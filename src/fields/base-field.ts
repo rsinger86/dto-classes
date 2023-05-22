@@ -106,11 +106,11 @@ export class BaseField<T extends BaseFieldOptions = BaseFieldOptions>  {
         for (const propName of getAllPropertyNames(this)) {
             const property = this[propName]
 
-            if (!property || !property['__isValidator']) {
+            if (!property || !property['__isPostParser']) {
                 continue;
             }
 
-            const options: ValidateMethodOptions = property['__ValidatorOptions'];
+            const options: ValidateMethodOptions = property['__PostParserOptions'];
             const validateMethod = property;
             const isNull = value === null;
             const isEmpty = (value === '' || value === null || value === undefined);

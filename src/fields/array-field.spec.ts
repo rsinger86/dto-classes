@@ -14,4 +14,20 @@ describe('test', () => {
         var value = schema.parse(['joe@hotmail.com', 'bill@gmail.com', 'louis@goldens.com']);
         expect(value).toEqual(['joe@hotmail.com', 'bill@gmail.com', 'louis@goldens.com']);
     });
+
+    test('should fail if exceed max items', async () => {
+        const schema = new ArrayField({ item: new EmailField(), maxLength: 2 });
+
+        expect(() => {
+            schema.parse(['joe@hotmail.com', 'bill@gmail.com', 'louis@goldens.com'])
+        }).toThrow('nsure this field has no more than 2 items');
+    });
+
+    test('should fail if doesn not meet min items', async () => {
+        const schema = new ArrayField({ item: new EmailField(), minLength: 4 });
+
+        expect(() => {
+            schema.parse(['joe@hotmail.com', 'bill@gmail.com', 'louis@goldens.com'])
+        }).toThrow('Ensure this field has at least 4 items');
+    });
 });
