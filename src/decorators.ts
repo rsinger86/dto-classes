@@ -1,7 +1,6 @@
 
 
 export interface ValidateMethodOptions {
-    receiveEmpty?: boolean;
     receieveNull?: boolean;
 }
 
@@ -13,7 +12,7 @@ export const AfterParse = (options: ValidateMethodOptions = {}) => {
     }
 }
 
-export const BeforeParse = (options: { receiveEmpty?: boolean } = {}) => {
+export const BeforeParse = (options: {} = {}) => {
     return (target: any, memberName: string, propertyDescriptor: PropertyDescriptor) => {
         target[memberName]['__isPreparser'] = true;
         return target;

@@ -49,15 +49,21 @@ export class DTObject extends BaseField {
         for (const field of this.getFieldsToParse()) {
             const rawValue = rawObject ? rawObject[field.name] : undefined;
 
-            try {
-                this[field.name] = field.parse(rawValue)
-            } catch (e) {
-                this[field.name] = undefined;
-                if (e instanceof ValidationError) {
-                    e.addParentPath(field.name);
-                    errors.push(e)
-                } else {
-                    throw e;
+            if (rawValue === undefined && !this.options.get('partial')) {
+                this[field.name] = this.getDefaultValue();
+            } else if (rawValue === null) {
+                this[field.name] = null;
+            } else {
+                try {
+                    this[field.name] = field.parse(rawValue)
+                } catch (e) {
+                    this[field.name] = undefined;
+                    if (e instanceof ValidationError) {
+                        e.addParentPath(field.name);
+                        errors.push(e)
+                    } else {
+                        throw e;
+                    }
                 }
             }
         }

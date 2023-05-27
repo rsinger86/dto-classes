@@ -2,7 +2,7 @@ import { getAllPropertyNames } from "../utils";
 import { ValidationError } from "../exceptions/validation-error";
 import { ValidationIssue } from "../exceptions/validation-issue";
 import { OptionsAccessor } from "../options-accessor";
-import { ValidateMethodOptions } from "../decorators";
+import { BeforeParse, ValidateMethodOptions } from "../decorators";
 
 
 export interface BaseFieldOptions {
@@ -12,6 +12,7 @@ export interface BaseFieldOptions {
     writeOnly?: boolean;
     source?: string;
     default?: any;
+    partial?: boolean;
 }
 
 export const BaseFieldDefaults = {
@@ -20,7 +21,8 @@ export const BaseFieldDefaults = {
     source: '',
     readOnly: false,
     writeOnly: false,
-    default: undefined
+    default: undefined,
+    partial: false
 };
 
 
@@ -64,6 +66,20 @@ export class BaseField<T extends BaseFieldOptions = BaseFieldOptions>  {
         return this._parent;
     }
 
+    public getDefaultValue(): any {
+        const value = this.options.get('default');
+
+        if (this.options.get('partial')) {
+            throw new Error("Cannot access default value when applying partial parsing and validation.");
+        }
+
+        if (typeof value === 'function') {
+            return value();
+        } else {
+            return value;
+        }
+    }
+
     public getValueToParse(rawData: any, fieldName: string) {
         return rawData;
     }
@@ -72,7 +88,8 @@ export class BaseField<T extends BaseFieldOptions = BaseFieldOptions>  {
         return internalObject;
     }
 
-    protected validatePossibleNullValue(value: any) {
+    @BeforeParse()
+    protected validateNull(value: any) {
         if (value === null && !this.options.get('allowNull')) {
             throw new ValidationError([new ValidationIssue('This field may not be null.')]);
         }
@@ -80,9 +97,16 @@ export class BaseField<T extends BaseFieldOptions = BaseFieldOptions>  {
         return value;
     }
 
-    public beforeParse(value: any) {
-        value = this.validatePossibleNullValue(value);
+    @BeforeParse()
+    protected validateUndefined(value: any) {
+        if (value === undefined && this.options.get('required')) {
+            throw new ValidationError([new ValidationIssue('This field is required.')]);
+        }
 
+        return value;
+    }
+
+    public beforeParse(value: any) {
         for (const propName of getAllPropertyNames(this)) {
             const property = this[propName]
 
@@ -114,10 +138,9 @@ export class BaseField<T extends BaseFieldOptions = BaseFieldOptions>  {
             const validateMethod = property;
             const isNull = value === null;
             const isEmpty = (value === '' || value === null || value === undefined);
+            const receiveNull = options.receieveNull ?? false;
 
-            if (isEmpty && options.receiveEmpty === false) {
-                continue;
-            } else if (isNull && options.receieveNull === false) {
+            if (isNull && !receiveNull) {
                 continue;
             }
 

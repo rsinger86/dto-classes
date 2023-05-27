@@ -50,7 +50,7 @@ export class StringField<T extends StringOptions = StringOptions> extends BaseFi
         return await this.parse(value);
     }
 
-    @AfterParse({ receieveNull: false })
+    @AfterParse()
     public validateBlankness(value: string) {
         if (!this.options.get('allowBlank') && value.length === 0) {
             throw new ValidationError('This field may not be blank.');

@@ -5,7 +5,7 @@ import { AfterParse } from "../decorators";
 
 
 export class EmailField extends StringField {
-    @AfterParse({ receiveEmpty: false })
+    @AfterParse()
     public matchesEmailPattern(value: string) {
         if (!REGEX_PATTERNS.EMAIL.test(value)) {
             throw new ValidationError('Not a valid email address.')

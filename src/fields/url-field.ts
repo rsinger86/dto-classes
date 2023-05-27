@@ -6,7 +6,7 @@ import { AfterParse } from "../decorators";
 
 export class UrlField extends StringField {
 
-    @AfterParse({ receiveEmpty: false })
+    @AfterParse()
     public validateUrlPattern(value: string) {
         if (!REGEX_PATTERNS.HTTP_URL.test(value)) {
             throw new ValidationError('This value is not a valid URL.')
