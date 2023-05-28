@@ -37,7 +37,7 @@ export class DTObject extends BaseField {
         return this._fields;
     }
 
-    private getFieldsToParse(): Array<BaseField | DTObject> {
+    private getFieldsToParse(): Array<BaseField> {
         return this.allFields.filter(x => {
             return x.options.get('readOnly') !== true;
         });
@@ -47,23 +47,18 @@ export class DTObject extends BaseField {
         const errors: ValidationError[] = [];
 
         for (const field of this.getFieldsToParse()) {
-            const rawValue = rawObject ? rawObject[field.name] : undefined;
+            const fieldName = field.getFieldName();
+            const rawValue = rawObject ? rawObject[fieldName] : undefined;
 
-            if (rawValue === undefined && !this.options.get('partial')) {
-                this[field.name] = this.getDefaultValue();
-            } else if (rawValue === null) {
-                this[field.name] = null;
-            } else {
-                try {
-                    this[field.name] = field.parse(rawValue)
-                } catch (e) {
-                    this[field.name] = undefined;
-                    if (e instanceof ValidationError) {
-                        e.addParentPath(field.name);
-                        errors.push(e)
-                    } else {
-                        throw e;
-                    }
+            try {
+                this[fieldName] = field.parse(rawValue)
+            } catch (e) {
+                this[fieldName] = undefined;
+                if (e instanceof ValidationError) {
+                    e.addParentPath(fieldName);
+                    errors.push(e)
+                } else {
+                    throw e;
                 }
             }
         }

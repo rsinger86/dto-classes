@@ -23,7 +23,7 @@ describe('test', () => {
         }).toThrow('nsure this field has no more than 2 items');
     });
 
-    test('should fail if doesn not meet min items', async () => {
+    test('should fail if doesnt not meet min items', async () => {
         const schema = new ArrayField({ item: new EmailField(), minLength: 4 });
 
         expect(() => {

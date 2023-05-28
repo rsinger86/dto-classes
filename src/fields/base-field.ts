@@ -27,6 +27,7 @@ export const BaseFieldDefaults = {
 
 
 
+
 export class BaseField<T extends BaseFieldOptions = BaseFieldOptions>  {
     public options: OptionsAccessor<BaseFieldOptions>;
     private _parent: BaseField;
@@ -39,7 +40,11 @@ export class BaseField<T extends BaseFieldOptions = BaseFieldOptions>  {
         this.parse = (value) => {
             value = this.beforeParse(value);
 
-            if (value !== null && value !== undefined) {
+            if (value === undefined && !this.options.get('partial')) {
+                return this.getDefaultValue();
+            }
+
+            if (value !== undefined && value !== null) {
                 value = originalParse.apply(this, [value]);
             }
 
@@ -58,7 +63,7 @@ export class BaseField<T extends BaseFieldOptions = BaseFieldOptions>  {
         this._fieldName = fieldName;
     }
 
-    get name(): string {
+    public getFieldName(): string {
         return this._fieldName;
     }
 
@@ -99,7 +104,10 @@ export class BaseField<T extends BaseFieldOptions = BaseFieldOptions>  {
 
     @BeforeParse()
     protected validateUndefined(value: any) {
-        if (value === undefined && this.options.get('required')) {
+        if (
+            value === undefined &&
+            this.options.get('required') &&
+            this.options.get('default') === undefined) {
             throw new ValidationError([new ValidationIssue('This field is required.')]);
         }
 

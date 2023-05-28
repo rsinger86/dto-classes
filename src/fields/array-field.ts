@@ -3,7 +3,7 @@ import { OptionsAccessor } from "../options-accessor";
 import { BaseFieldOptions, BaseField, BaseFieldDefaults } from "./base-field";
 import { ParseReturnType } from "../types";
 import { ValidationError } from "../exceptions/validation-error";
-import { AfterParse } from "src/decorators";
+import { AfterParse } from "../decorators";
 
 
 
