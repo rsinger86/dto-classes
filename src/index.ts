@@ -12,8 +12,8 @@ class Person extends DTObject {
     family = ArrayField.bind({ items: Recursive(Person) })
 
     @Format({ fieldName: 'fullName' })
-    getFullName(object) {
-        return 'hi'
+    fullName(object) {
+        return object.firstName + ' ' + object.lastName;
     }
 }
 

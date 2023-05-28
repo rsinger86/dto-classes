@@ -23,7 +23,7 @@ export const BeforeParse = (options: {} = {}) => {
 export const Format = (options: { fieldName?: string } = {}) => {
     return (target: any, memberName: string, propertyDescriptor: PropertyDescriptor) => {
         if (!options.fieldName) {
-            options.fieldName = target[memberName].name.replace(/^get/, '')
+            options.fieldName = target[memberName].name
         }
 
         target[memberName]['__isFormatter'] = true;

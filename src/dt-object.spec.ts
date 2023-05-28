@@ -1,3 +1,4 @@
+import { Format } from "./decorators";
 import { DTObject } from "./dt-object";
 import { ArrayField } from "./fields/array-field";
 import { BooleanField } from "./fields/boolean-field";
@@ -244,5 +245,43 @@ describe('test format', () => {
         };
 
         expect(data).toEqual(expected);
+    });
+
+    test('format should use decorated function', async () => {
+        class Person extends DTObject {
+            firstName = StringField.bind()
+            lastName = StringField.bind()
+
+            @Format()
+            fullName(obj) {
+                return `${obj.firstName} ${obj.lastName}`;
+            }
+        }
+
+        const data = new Person({}).format({
+            firstName: 'Steve',
+            lastName: 'Coolman',
+        });
+
+        expect(data).toEqual({ firstName: 'Steve', lastName: 'Coolman', fullName: 'Steve Coolman' });
+    });
+
+    test('format should use decorated function w/ custom field name', async () => {
+        class Person extends DTObject {
+            firstName = StringField.bind()
+            lastName = StringField.bind()
+
+            @Format({ fieldName: 'completeName' })
+            fullName(obj) {
+                return `${obj.firstName} ${obj.lastName}`;
+            }
+        }
+
+        const data = new Person({}).format({
+            firstName: 'Steve',
+            lastName: 'Coolman',
+        });
+
+        expect(data).toEqual({ firstName: 'Steve', lastName: 'Coolman', completeName: 'Steve Coolman' });
     });
 });
