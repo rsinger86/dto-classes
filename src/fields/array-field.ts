@@ -4,16 +4,17 @@ import { BaseFieldOptions, BaseField, BaseFieldDefaults } from "./base-field";
 import { ParseReturnType } from "../types";
 import { ValidationError } from "../exceptions/validation-error";
 import { AfterParse } from "../decorators";
+import { Deferred } from "../recursive";
 
 
 
 export interface ArrayOptions extends BaseFieldOptions {
-    item: BaseField
+    items: BaseField
     maxLength?: number | null;
     minLength?: number | null;
 }
 
-export class ArrayField<T extends ArrayOptions = ArrayOptions> extends BaseField {
+export class ArrayField<T extends ArrayOptions> extends BaseField {
     public options: OptionsAccessor<ArrayOptions>;
 
     constructor(options: T) {
@@ -21,14 +22,14 @@ export class ArrayField<T extends ArrayOptions = ArrayOptions> extends BaseField
         this.options = new OptionsAccessor<ArrayOptions>(options, {
             maxLength: null,
             minLength: null,
-            item: null as any,
+            items: null as any,
             ...BaseFieldDefaults
         })
     }
 
-    public parse(value: any): ParseReturnType<Array<T['item']>, T> {
+    public parse(value: any): ParseReturnType<Array<T['items']>, T> {
         const parsedItems: any[] = [];
-        const itemField = this.options.get('item') as BaseField;
+        const itemField = this.options.get('items') as BaseField;
 
         if (!Array.isArray(value)) {
             throw new ValidationIssue(`Ensure value is an array.`)
@@ -41,7 +42,7 @@ export class ArrayField<T extends ArrayOptions = ArrayOptions> extends BaseField
         return parsedItems as any;
     }
 
-    public async parseAsync(value: any): Promise<ParseReturnType<Array<T['item']>, T>> {
+    public async parseAsync(value: any): Promise<ParseReturnType<Array<T['items']>, T>> {
         return await this.parse(value);
     }
 
@@ -68,8 +69,23 @@ export class ArrayField<T extends ArrayOptions = ArrayOptions> extends BaseField
     }
 
 
-    public format(value: any): string {
-        return String(value);
+    public format(value: any): any[] {
+        const formattedItems: any[] = [];
+        let itemField = this.options.get('items') as any;
+
+        if (!Array.isArray(value)) {
+            return [];
+        }
+
+        if (itemField instanceof Deferred) {
+            itemField = itemField.construct()
+        }
+
+        for (const v of value) {
+            formattedItems.push(itemField.format(v))
+        }
+
+        return formattedItems;
     }
 
 }

@@ -13,6 +13,7 @@ export interface BaseFieldOptions {
     source?: string;
     default?: any;
     partial?: boolean;
+    formatSource?: string | null;
 }
 
 export const BaseFieldDefaults = {
@@ -22,7 +23,8 @@ export const BaseFieldDefaults = {
     readOnly: false,
     writeOnly: false,
     default: undefined,
-    partial: false
+    partial: false,
+    formatSource: null
 };
 
 
@@ -89,8 +91,9 @@ export class BaseField<T extends BaseFieldOptions = BaseFieldOptions>  {
         return rawData;
     }
 
-    public getValueToFormat(internalObject: any) {
-        return internalObject;
+    public getValueToFormat(internalObject: any): any {
+        const source = this.options.get('formatSource') ?? this._fieldName;
+        return internalObject[source] ?? null;
     }
 
     @BeforeParse()
@@ -158,8 +161,8 @@ export class BaseField<T extends BaseFieldOptions = BaseFieldOptions>  {
         return value;
     }
 
-    public format(value: any) {
-        return value;
+    public format(value: any): any {
+        return String(value);
     }
 
     static bind<

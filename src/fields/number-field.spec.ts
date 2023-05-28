@@ -1,6 +1,6 @@
 import { NumberField } from "./number-field";
 
-describe('test', () => {
+describe('test parse', () => {
     test('parse float string', async () => {
         const schema = new NumberField({});
         const value = schema.parse('3.4444');
@@ -29,6 +29,19 @@ describe('test', () => {
         const schema = new NumberField({ minValue: 10 });
         expect(() => schema.parse('5')).toThrowError('Ensure the value is at least 10.')
     });
+});
 
 
+describe('test format', () => {
+    test('format string', async () => {
+        const schema = new NumberField({});
+        const value = schema.format('3.4444');
+        expect(value).toEqual(3.4444);
+    });
+
+    test('format NaN', async () => {
+        const schema = new NumberField({});
+        const value = schema.format('adfadf3.4444');
+        expect(value).toEqual(null);
+    });
 });

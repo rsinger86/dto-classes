@@ -1,37 +1,22 @@
 import { DTObject } from "./dt-object";
-import { EmailField } from "./fields/email-field";
+import { ArrayField } from "./fields/array-field";
 import { StringField } from "./fields/string-field";
+import { Recursive } from "./recursive";
 
 
-/* class AddressDTO extends DTObject {
-    street = StringField.bind()
-}
 
-class PersonDTO extends DTObject {
+class Person extends DTObject {
     firstName = StringField.bind()
-    email = EmailField.bind({ default: 'anon@hotmail.com' })
-    address = AddressDTO.bind()
+    lastName = StringField.bind()
+    family = ArrayField.bind({ items: Recursive(Person) })
 }
 
-const person = new PersonDTO()
- */
-var s = new EmailField()
-s.parse('r@hotmailf.com')
+const schema = new Person({})
 
-/* try {
-    person.parse({
-        firstName: 'Robert',
-        lastName: 'Singer',
-        email: 'robert@hotmail.com',
-        address: {
-            street: 'Hillgrove'
-        }
-    });
-} catch (e) {
-    console.log(e.issues)
-}
+const data = schema.format({
+    firstName: 'Mr',
+    lastName: 'Hotmire',
+    family: [{ firstName: 'Steve', lastName: 'Coolman', family: [{ firstName: 'Jake', lastName: 'Coolman', family: [{ firstName: 'Jesus' }] }] }]
+})
 
-console.log(person.firstName)
-console.log(person.email)
-console.log(person.address.street)
- */
+console.log(JSON.stringify(data, null, 2));

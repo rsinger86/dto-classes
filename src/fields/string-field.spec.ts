@@ -1,6 +1,6 @@
 import { StringField } from "./string-field";
 
-describe('test', () => {
+describe('parse tests', () => {
     test('should allow blank', async () => {
         const schema = new StringField({ allowBlank: true });
         const value = await schema.parseAsync('');
@@ -44,4 +44,27 @@ describe('test', () => {
         const schema = new StringField({ minLength: 3 });
         expect(() => schema.parse('A')).toThrowError('Ensure this field has at least 3 characters')
     });
+});
+
+
+describe('format tests', () => {
+    test('should format as string', async () => {
+        const schema = new StringField({ allowBlank: true });
+        const value = schema.format(1)
+        expect(value).toEqual('1');
+    });
+
+    test('should format as string', async () => {
+        const schema = new StringField({ allowBlank: true });
+        const value = schema.format({ 1: 2 })
+        expect(value).toEqual('[object Object]');
+    });
+
+    test('should format as string', async () => {
+        const schema = new StringField({ allowBlank: true });
+        const value = schema.format(false)
+        expect(value).toEqual('false');
+    });
+
+
 });

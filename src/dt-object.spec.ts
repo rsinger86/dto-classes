@@ -1,9 +1,12 @@
 import { DTObject } from "./dt-object";
+import { ArrayField } from "./fields/array-field";
 import { BooleanField } from "./fields/boolean-field";
+import { DateTimeField } from "./fields/date-time-field";
 import { StringField } from "./fields/string-field";
+import { Recursive } from "./recursive";
 
 
-describe('test', () => {
+describe('test parse', () => {
     test('simple fields should succeed', async () => {
         class Person extends DTObject {
             firstName = StringField.bind()
@@ -58,11 +61,13 @@ describe('test', () => {
         class EmployerDto extends DTObject {
             name = StringField.bind()
             public = BooleanField.bind()
+            dateStarted = DateTimeField.bind()
         }
 
         class JobDto extends DTObject {
             title = StringField.bind()
             isSatisfying = BooleanField.bind()
+            company = EmployerDto.bind()
         }
 
         class PersonDto extends DTObject {
@@ -71,10 +76,68 @@ describe('test', () => {
             job = JobDto.bind()
         }
 
-        const person = new PersonDto().parse({ firstName: 'Robert', job: { title: 'Programmer', isSatisfying: true } });
+        const person = new PersonDto().parse({
+            firstName: 'Robert',
+            job: {
+                title: 'Programmer', isSatisfying: true,
+                company: {
+                    name: 'Dunder Mifflin',
+                    public: false,
+                    dateStarted: '1999-06-05'
+                }
+            }
+        });
         expect(person.firstName).toEqual('Robert');
         expect(person.lastName).toEqual('James');
         expect(person.job.title).toEqual('Programmer');
         expect(person.job.isSatisfying).toEqual(true);
+        expect(person.job.company.name).toEqual('Dunder Mifflin');
+        expect(person.job.company.public).toEqual(false);
+        expect(person.job.company.dateStarted).toEqual(new Date('1999-06-05'));
+    });
+});
+
+
+describe('test format', () => {
+    test('format should exclude write only fields', async () => {
+        class Person extends DTObject {
+            firstName = StringField.bind()
+            lastName = StringField.bind()
+            password = StringField.bind({ writeOnly: true })
+        }
+
+        const data = new Person({}).format({ firstName: 'Robert', lastName: 'Singer', password: '123' });
+        expect(data).toEqual({ firstName: 'Robert', lastName: 'Singer' });
+    });
+
+    test('format should obey formatSource', async () => {
+        class Person extends DTObject {
+            firstName = StringField.bind()
+            lastName = StringField.bind()
+            birthday = DateTimeField.bind({ formatSource: 'dateOfBirth' })
+        }
+
+        const data = new Person({}).format({
+            firstName: 'Robert',
+            lastName: 'Singer',
+            dateOfBirth: new Date('1987-11-11')
+        });
+
+        expect(data).toEqual({
+            firstName: 'Robert',
+            lastName: 'Singer',
+            birthday: "1987-11-11T00:00:00.000Z"
+        });
+    });
+
+    test('format nested object', async () => {
+        class Person extends DTObject {
+            firstName = StringField.bind()
+            lastName = StringField.bind()
+            family = ArrayField.bind({ items: Recursive(Person) })
+        }
+
+        const data = new Person({})
+
     });
 });

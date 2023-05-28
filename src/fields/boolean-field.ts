@@ -45,7 +45,7 @@ export class BooleanField<T extends BaseFieldOptions> extends BaseField {
             return true;
         } else if (this.FALSE_VALUES.includes(value)) {
             return false;
-        } else if (this.options.get('allowNull') && this.FALSE_VALUES.includes(value)) {
+        } else if (this.options.get('allowNull') && this.NULL_VALUES.includes(value)) {
             return null as any;
         }
 

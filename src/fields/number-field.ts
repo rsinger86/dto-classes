@@ -10,7 +10,7 @@ export interface NumberFieldOptions extends BaseFieldOptions {
     minValue?: number;
 }
 
-export class NumberField<T extends NumberFieldOptions = NumberFieldOptions> extends BaseField {
+export class NumberField<T extends NumberFieldOptions> extends BaseField {
     public options: OptionsAccessor<NumberFieldOptions>;
 
     constructor(options?: T) {
@@ -58,8 +58,14 @@ export class NumberField<T extends NumberFieldOptions = NumberFieldOptions> exte
         return value;
     }
 
-    public format(value: any): number {
-        return value;
+    public format(value: any) {
+        const v = Number(value);
+
+        if (Number.isNaN(v)) {
+            return null as any;
+        }
+
+        return v;
     }
 
 }

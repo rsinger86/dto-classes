@@ -4,19 +4,19 @@ import { StringField } from "./string-field";
 
 describe('test', () => {
     test('should parse array of strings', async () => {
-        const schema = new ArrayField({ item: new StringField() });
+        const schema = new ArrayField({ items: new StringField() });
         var value = schema.parse(['A', 'B', 'C   ']);
         expect(value).toEqual(['A', 'B', 'C']);
     });
 
     test('should parse array of emails', async () => {
-        const schema = new ArrayField({ item: new EmailField() });
+        const schema = new ArrayField({ items: new EmailField() });
         var value = schema.parse(['joe@hotmail.com', 'bill@gmail.com', 'louis@goldens.com']);
         expect(value).toEqual(['joe@hotmail.com', 'bill@gmail.com', 'louis@goldens.com']);
     });
 
     test('should fail if exceed max items', async () => {
-        const schema = new ArrayField({ item: new EmailField(), maxLength: 2 });
+        const schema = new ArrayField({ items: new EmailField(), maxLength: 2 });
 
         expect(() => {
             schema.parse(['joe@hotmail.com', 'bill@gmail.com', 'louis@goldens.com'])
@@ -24,7 +24,7 @@ describe('test', () => {
     });
 
     test('should fail if doesnt not meet min items', async () => {
-        const schema = new ArrayField({ item: new EmailField(), minLength: 4 });
+        const schema = new ArrayField({ items: new EmailField(), minLength: 4 });
 
         expect(() => {
             schema.parse(['joe@hotmail.com', 'bill@gmail.com', 'louis@goldens.com'])
