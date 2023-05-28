@@ -1,7 +1,7 @@
 import { BaseField, BaseFieldOptions } from "./fields/base-field";
 
 
-export class Deferred<T extends typeof BaseField> {
+export class DeferredField<T extends typeof BaseField = typeof BaseField> {
     private fieldClass: typeof BaseField
     private options: BaseFieldOptions;
 
@@ -20,5 +20,5 @@ export function Recursive<T extends typeof BaseField>(
     field: T,
     options: BaseFieldOptions = {}
 ): InstanceType<T> {
-    return new Deferred(field, options) as any;
+    return new DeferredField(field, options) as any;
 }

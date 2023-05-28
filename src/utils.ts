@@ -18,3 +18,12 @@ export function getAllPropertyNames(obj): string[] {
 
     return allProps
 }
+
+
+export function isKeyableObject(candidate: any): boolean {
+    return (
+        typeof candidate === 'object' &&
+        !Array.isArray(candidate) &&
+        candidate !== null
+    )
+}

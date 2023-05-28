@@ -4,7 +4,7 @@ import { BaseFieldOptions, BaseField, BaseFieldDefaults } from "./base-field";
 import { ParseReturnType } from "../types";
 import { ValidationError } from "../exceptions/validation-error";
 import { AfterParse } from "../decorators";
-import { Deferred } from "../recursive";
+import { DeferredField } from "../recursive";
 
 
 
@@ -77,7 +77,7 @@ export class ArrayField<T extends ArrayOptions> extends BaseField {
             return [];
         }
 
-        if (itemField instanceof Deferred) {
+        if (itemField instanceof DeferredField) {
             itemField = itemField.construct()
         }
 

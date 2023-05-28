@@ -1,7 +1,8 @@
 import { ValidationError } from "./exceptions/validation-error";
 import { OptionsAccessor } from "./options-accessor";
 import { BaseField, BaseFieldOptions } from "./fields/base-field";
-import { Deferred } from "./recursive";
+import { DeferredField } from "./recursive";
+import { getAllPropertyNames, isKeyableObject } from "./utils";
 
 
 
@@ -13,12 +14,12 @@ export class DTObject extends BaseField {
         super(options ?? {});
     }
 
-    private get allFields(): Array<BaseField | DTObject> {
+    private get allFields(): Array<BaseField> {
         if (this._fields.length > 0) {
             return this._fields;
         }
 
-        const fields: Array<BaseField | DTObject> = []
+        const fields: Array<BaseField> = []
 
         for (const attrName of Object.keys(this)) {
             if (attrName === '_parent') {
@@ -27,8 +28,8 @@ export class DTObject extends BaseField {
 
             let attribute = this[attrName];
 
-            if (attribute instanceof BaseField) {
-                if (attribute instanceof Deferred) {
+            if (attribute instanceof BaseField || attribute instanceof DeferredField) {
+                if (attribute instanceof DeferredField) {
                     attribute = (attribute as any).construct()
                 }
 
@@ -40,6 +41,20 @@ export class DTObject extends BaseField {
 
         this._fields = fields;
         return this._fields;
+    }
+
+    private getFormatterMethods(): Function[] {
+        const methods: Function[] = [];
+
+        for (const propName of getAllPropertyNames(this)) {
+            const property = this[propName] as any;
+
+            if (property && property['__isFormatter']) {
+                methods.push(property);
+            }
+        }
+
+        return methods;
     }
 
     private getFieldsToParse(): Array<BaseField> {
@@ -87,8 +102,19 @@ export class DTObject extends BaseField {
 
         for (const field of this.getFieldsToFormat()) {
             const fieldName = field.getFieldName();
-            const internalValue = field.getValueToFormat(internalObj);
-            formatted[fieldName] = field.format(internalValue);
+
+            if (isKeyableObject(internalObj)) {
+                const internalValue = field.getValueToFormat(internalObj);
+                formatted[fieldName] = field.format(internalValue);
+            } else {
+                formatted[fieldName] = null;
+            }
+
+        }
+
+        for (const formatter of this.getFormatterMethods()) {
+            const fieldName = formatter['__FormatterOptions']['fieldName']
+            formatted[fieldName] = formatter.apply(this, [internalObj]);
         }
 
         return formatted;

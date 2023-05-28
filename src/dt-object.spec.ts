@@ -130,14 +130,119 @@ describe('test format', () => {
         });
     });
 
-    test('format nested object', async () => {
+    test('format recursive array', async () => {
         class Person extends DTObject {
             firstName = StringField.bind()
             lastName = StringField.bind()
+            dateOfBirth = DateTimeField.bind()
             family = ArrayField.bind({ items: Recursive(Person) })
         }
 
-        const data = new Person({})
+        const data = new Person({}).format({
+            firstName: 'Steve',
+            lastName: 'Coolman',
+            dateOfBirth: new Date('1960-01-01'),
+            family: [
+                {
+                    firstName: "Jake",
+                    lastName: "Coolman",
+                    family: [
+                        {
+                            firstName: "Child A",
+                            lastName: "Coolman"
+                        }
+                    ]
+                },
+                {
+                    firstName: "Tim",
+                    lastName: "Coolman",
+                    family: [
+                        {
+                            firstName: "Child B",
+                            lastName: "Coolman"
+                        }
+                    ]
+                }
+            ]
+        });
 
+        const expected = {
+            "firstName": "Steve",
+            "lastName": "Coolman",
+            "dateOfBirth": "1960-01-01T00:00:00.000Z",
+            "family": [
+                {
+                    "firstName": "Jake",
+                    "lastName": "Coolman",
+                    "dateOfBirth": null,
+                    "family": [
+                        {
+                            "firstName": "Child A",
+                            "lastName": "Coolman",
+                            "dateOfBirth": null,
+                            "family": []
+                        }
+                    ]
+                },
+                {
+                    "firstName": "Tim",
+                    "lastName": "Coolman",
+                    "dateOfBirth": null,
+                    "family": [
+                        {
+                            "firstName": "Child B",
+                            "lastName": "Coolman",
+                            "dateOfBirth": null,
+                            "family": []
+                        }
+                    ]
+                }
+            ]
+        };
+
+        expect(data).toEqual(expected);
+
+    });
+
+
+    test('format recursive object', async () => {
+        class StaffMember extends DTObject {
+            firstName = StringField.bind()
+            lastName = StringField.bind()
+            supervisor = Recursive(StaffMember, { required: false })
+        }
+
+        const data = new StaffMember({}).format({
+            firstName: 'Robert',
+            lastName: 'S',
+            supervisor: {
+                firstName: 'Matt',
+                lastName: 'X',
+                supervisor: {
+                    firstName: 'Pat',
+                    lastName: 'X'
+                }
+            }
+        });
+
+        const expected = {
+            "firstName": "Robert",
+            "lastName": "S",
+            "supervisor": {
+                "firstName": "Matt",
+                "lastName": "X",
+                "supervisor": {
+                    "firstName": "Pat",
+                    "lastName": "X",
+                    "supervisor": {
+                        "firstName": null,
+                        "lastName": null,
+                        "supervisor": null
+                    }
+                }
+            }
+        };
+
+        expect(data).toEqual(expected);
     });
 });
