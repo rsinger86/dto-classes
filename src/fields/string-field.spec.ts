@@ -55,6 +55,55 @@ describe('parse tests', () => {
     });
 });
 
+describe('validate pattern tests', () => {
+    test('should match', async () => {
+        const schema = new StringField({ pattern: /^Hi/ });
+        const value = await schema.parse('Hi');
+        expect(value).toEqual('Hi');
+    });
+
+    test('should not match', async () => {
+        const schema = new StringField({ pattern: /^Hi/ });
+
+        await expect(
+            async () => await schema.parse('hello')
+        ).rejects.toThrow('This value does not match the required pattern.');
+    });
+});
+
+
+describe('validate email format tests', () => {
+    test('should fail for invalid email', async () => {
+        const schema = new StringField({ format: 'email' });
+        await expect(
+            async () => await schema.parse('tester.at.hotmail')
+        ).rejects.toThrowError('Not a valid email address')
+    });
+
+    test('should pass for valid email', async () => {
+        const schema = new StringField({ format: 'email' });
+        const value = await schema.parse('tester@hotmail.com');
+        expect(value).toEqual('tester@hotmail.com');
+    });
+});
+
+
+describe('validate url format tests', () => {
+    test('should match', async () => {
+        let testValue = 'https://github.com/encode/django-rest-framework/blob/master/rest_framework/fields.py'
+        const schema = new StringField({ format: 'url' });
+        const value = await schema.parse(testValue);
+        expect(value).toEqual(testValue);
+    });
+
+    test('should not match', async () => {
+        const schema = new StringField({ format: 'url' });
+        await expect(
+            async () => await schema.parse('hello')
+        ).rejects.toThrow('This value is not a valid URL.');
+    });
+});
+
 
 describe('format tests', () => {
     test('should format as string', async () => {
@@ -75,3 +124,5 @@ describe('format tests', () => {
         expect(value).toEqual('false');
     });
 });
+
+

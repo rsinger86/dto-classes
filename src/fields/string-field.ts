@@ -1,8 +1,8 @@
 import { ValidationError } from "../exceptions/validation-error";
-import { BaseField, BaseFieldDefaults, BaseFieldOptions } from "./base-field";
-import { OptionsAccessor } from "../options-accessor";
+import { BaseField, BaseFieldOptions } from "./base-field";
 import { ParseReturnType } from "../types";
 import { AfterParse } from "../decorators";
+import { REGEX_PATTERNS } from "src/regex";
 
 
 export interface StringOptions extends BaseFieldOptions {
@@ -10,24 +10,15 @@ export interface StringOptions extends BaseFieldOptions {
     trimWhitespace?: boolean;
     maxLength?: number | null;
     minLength?: number | null;
-    toUpper?: boolean;
-    toLower?: boolean;
+    pattern?: RegExp,
+    format?: 'email' | 'url'
 }
 
 export class StringField<T extends StringOptions = StringOptions> extends BaseField {
-    public options: OptionsAccessor<StringOptions>;
+    public _options: StringOptions;
 
     constructor(options?: T) {
         super(options);
-        this.options = new OptionsAccessor<StringOptions>(options ?? {}, {
-            allowBlank: false,
-            trimWhitespace: true,
-            maxLength: null,
-            minLength: null,
-            toUpper: false,
-            toLower: false,
-            ...BaseFieldDefaults
-        })
     }
 
     public async parse(value: any): ParseReturnType<string, T> {
@@ -38,8 +29,9 @@ export class StringField<T extends StringOptions = StringOptions> extends BaseFi
         }
 
         value = String(value) as string;
+        const trimWhitespace = this._options.trimWhitespace ?? true;
 
-        if (this.options.get('trimWhitespace')) {
+        if (trimWhitespace) {
             value = value.trim();
         }
 
@@ -48,7 +40,7 @@ export class StringField<T extends StringOptions = StringOptions> extends BaseFi
 
     @AfterParse()
     public validateBlankness(value: string) {
-        if (!this.options.get('allowBlank') && value.length === 0) {
+        if (!this._options.allowBlank && value.length === 0) {
             throw new ValidationError('This field may not be blank.');
         }
 
@@ -57,7 +49,7 @@ export class StringField<T extends StringOptions = StringOptions> extends BaseFi
 
     @AfterParse({ receieveNull: false })
     public validateMinLength(value: string) {
-        const minLen = this.options.get('minLength');
+        const minLen = this._options.minLength ?? null;
 
         if (minLen !== null && value.length < minLen) {
             throw new ValidationError(`Ensure this field has at least ${minLen} characters.`)
@@ -68,10 +60,39 @@ export class StringField<T extends StringOptions = StringOptions> extends BaseFi
 
     @AfterParse({ receieveNull: false })
     public validateMaxLength(value: string) {
-        const maxLength = this.options.get('maxLength');
+        const maxLength = this._options.maxLength ?? null;
 
         if (maxLength !== null && value.length > maxLength) {
             throw new ValidationError(`Ensure this field has no more than ${maxLength} characters.`)
+        }
+
+        return value;
+    }
+
+    @AfterParse({ receieveNull: false })
+    public validatePattern(value: string) {
+        const pattern = this._options.pattern ?? null;
+
+        if (pattern && !pattern.test(value)) {
+            throw new ValidationError('This value does not match the required pattern.');
+        }
+
+        return value;
+    }
+
+    @AfterParse()
+    public validateEmailFormat(value: string) {
+        if (this._options.format === 'email' && !REGEX_PATTERNS.EMAIL.test(value)) {
+            throw new ValidationError('Not a valid email address.')
+        }
+
+        return value;
+    }
+
+    @AfterParse()
+    public validateUrlFormat(value: string) {
+        if (this._options.format === 'url' && !REGEX_PATTERNS.HTTP_URL.test(value)) {
+            throw new ValidationError('This value is not a valid URL.')
         }
 
         return value;

@@ -1,6 +1,5 @@
-import { BaseField, BaseFieldDefaults, BaseFieldOptions } from "./base-field";
+import { BaseField, BaseFieldOptions } from "./base-field";
 import { ParseReturnType } from "../types";
-import { OptionsAccessor } from "../options-accessor";
 import { AfterParse } from "../decorators";
 import { ValidationError } from "../exceptions/validation-error";
 
@@ -10,15 +9,10 @@ export interface NumberOptions extends BaseFieldOptions {
 }
 
 export class NumberField<T extends NumberOptions> extends BaseField {
-    public options: OptionsAccessor<NumberOptions>;
+    _options: T;
 
     constructor(options?: T) {
         super(options);
-        this.options = new OptionsAccessor<NumberOptions>(options ?? {}, {
-            minValue: -Infinity,
-            maxValue: Infinity,
-            ...BaseFieldDefaults
-        })
     }
 
     public async parse(value: any): ParseReturnType<number, T> {
@@ -37,7 +31,7 @@ export class NumberField<T extends NumberOptions> extends BaseField {
 
     @AfterParse({ receieveNull: false })
     public validateMaxValue(value: number) {
-        const maxValue = this.options.get('maxValue');
+        const maxValue = this._options.maxValue ?? null;
 
         if (maxValue !== null && value > maxValue) {
             throw new ValidationError(`Ensure the value is no more than ${maxValue}.`)
@@ -47,8 +41,8 @@ export class NumberField<T extends NumberOptions> extends BaseField {
     }
 
     @AfterParse({ receieveNull: false })
-    public validateMinValue(value: any[]) {
-        const minValue = this.options.get('minValue');
+    public validateMinValue(value: any) {
+        const minValue = this._options.minValue ?? null;
 
         if (minValue !== null && value < minValue) {
             throw new ValidationError(`Ensure the value is at least ${minValue}.`)

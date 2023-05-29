@@ -1,5 +1,4 @@
 import { ValidationError } from "./exceptions/validation-error";
-import { OptionsAccessor } from "./options-accessor";
 import { BaseField, BaseFieldOptions } from "./fields/base-field";
 import { DeferredField } from "./recursive";
 import { getAllPropertyNames, isKeyableObject } from "./utils";
@@ -7,7 +6,8 @@ import { getAllPropertyNames, isKeyableObject } from "./utils";
 
 
 export class DTObject extends BaseField {
-    public options: OptionsAccessor<BaseFieldOptions>;
+    public _options: any;
+
     private _fields: Array<BaseField | DTObject> = [];
 
     constructor(options?: BaseFieldOptions) {
@@ -59,13 +59,13 @@ export class DTObject extends BaseField {
 
     private getFieldsToParse(): Array<BaseField> {
         return this.allFields.filter(x => {
-            return x.options.get('readOnly') !== true;
+            return x._options.readOnly !== true;
         });
     }
 
     private getFieldsToFormat(): Array<BaseField> {
         return this.allFields.filter(x => {
-            return x.options.get('writeOnly') !== true;
+            return x._options.writeOnly !== true;
         });
     }
 

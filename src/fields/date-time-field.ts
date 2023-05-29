@@ -1,6 +1,5 @@
-import { BaseField, BaseFieldDefaults, BaseFieldOptions } from "./base-field";
+import { BaseField, BaseFieldOptions } from "./base-field";
 import { ParseReturnType } from "../types";
-import { OptionsAccessor } from "../options-accessor";
 import { AfterParse } from "../decorators";
 import { ValidationError } from "../exceptions/validation-error";
 
@@ -11,16 +10,10 @@ export interface DateTimeFieldOptions extends BaseFieldOptions {
 }
 
 export class DateTimeField<T extends DateTimeFieldOptions> extends BaseField {
-    public options: OptionsAccessor<DateTimeFieldOptions>;
+    _options: T;
 
     constructor(options?: T) {
         super(options);
-        this.options = new OptionsAccessor<DateTimeFieldOptions>(options ?? {}, {
-            maxDate: null,
-            minDate: null,
-            format: 'iso',
-            ...BaseFieldDefaults
-        })
     }
 
     public async parse(value: any): ParseReturnType<Date, T> {
@@ -43,8 +36,8 @@ export class DateTimeField<T extends DateTimeFieldOptions> extends BaseField {
     }
 
     @AfterParse({ receieveNull: false })
-    public validateMaxDate(value: number) {
-        const maxDate = this.options.get('maxDate');
+    public validateMaxDate(value: Date) {
+        const maxDate = this._options.maxDate ?? null;
 
         if (maxDate !== null && value > maxDate) {
             throw new ValidationError(`Ensure the value is no more than ${maxDate}.`)
@@ -54,8 +47,8 @@ export class DateTimeField<T extends DateTimeFieldOptions> extends BaseField {
     }
 
     @AfterParse({ receieveNull: false })
-    public validateMinDate(value: any[]) {
-        const minDate = this.options.get('minDate');
+    public validateMinDate(value: Date) {
+        const minDate = this._options.minDate ?? null;
 
         if (minDate !== null && value < minDate) {
             throw new ValidationError(`Ensure the value is at least ${minDate}.`)

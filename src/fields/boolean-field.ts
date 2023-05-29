@@ -4,7 +4,9 @@ import { ValidationIssue } from "../exceptions/validation-issue";
 import { ParseReturnType } from "src/types";
 
 
-export class BooleanField<T extends BaseFieldOptions> extends BaseField {
+export class BooleanField<T extends BaseFieldOptions = BaseFieldOptions> extends BaseField {
+    _options: T;
+
     readonly TRUE_VALUES = [
         't', 'T',
         'y', 'Y', 'yes', 'Yes', 'YES',
@@ -25,7 +27,7 @@ export class BooleanField<T extends BaseFieldOptions> extends BaseField {
 
     readonly NULL_VALUES = ['null', 'Null', 'NULL', '', null];
 
-    constructor(options: T) {
+    constructor(options?: T) {
         super(options);
     }
 
@@ -34,7 +36,7 @@ export class BooleanField<T extends BaseFieldOptions> extends BaseField {
             return true as any;
         } else if (this.FALSE_VALUES.includes(value)) {
             return false as any;
-        } else if (this.options.get('allowNull') && this.NULL_VALUES.includes(value)) {
+        } else if (this._options.allowNull && this.NULL_VALUES.includes(value)) {
             return null as any;
         }
 
@@ -46,7 +48,7 @@ export class BooleanField<T extends BaseFieldOptions> extends BaseField {
             return true;
         } else if (this.FALSE_VALUES.includes(value)) {
             return false;
-        } else if (this.options.get('allowNull') && this.NULL_VALUES.includes(value)) {
+        } else if (this._options.allowNull && this.NULL_VALUES.includes(value)) {
             return null as any;
         }
 

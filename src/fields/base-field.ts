@@ -1,12 +1,12 @@
 import { getAllPropertyNames } from "../utils";
 import { ValidationError } from "../exceptions/validation-error";
 import { ValidationIssue } from "../exceptions/validation-issue";
-import { OptionsAccessor } from "../options-accessor";
 import { BeforeParse, ValidateMethodOptions } from "../decorators";
 import { ParseReturnType } from "../types";
 
 
 export interface BaseFieldOptions {
+    items?: any;
     required?: boolean;
     allowNull?: boolean;
     readOnly?: boolean;
@@ -17,31 +17,21 @@ export interface BaseFieldOptions {
     formatSource?: string | null;
 }
 
-export const BaseFieldDefaults = {
-    required: true,
-    allowNull: false,
-    source: '',
-    readOnly: false,
-    writeOnly: false,
-    default: undefined,
-    partial: false,
-    formatSource: null
-};
 
+export class BaseField {
+    public readonly _options: BaseFieldOptions;
 
-export class BaseField<T extends BaseFieldOptions = BaseFieldOptions> {
-    public options: OptionsAccessor<BaseFieldOptions>;
     private _parent: BaseField;
     private _fieldName: string;
 
-    constructor(options: BaseFieldOptions = {}) {
-        this.options = new OptionsAccessor<BaseFieldOptions>(options, BaseFieldDefaults);
+    constructor(options?: BaseFieldOptions) {
+        this._options = options ?? {};
         const originalParse = this.parse;
 
         this.parse = async (value) => {
             value = await this.beforeParse(value);
 
-            if (value === undefined && !this.options.get('partial')) {
+            if (value === undefined && !this._options.partial) {
                 return this.getDefaultValue();
             }
 
@@ -54,9 +44,10 @@ export class BaseField<T extends BaseFieldOptions = BaseFieldOptions> {
         };
     }
 
+
     public clone() {
         const ThisClass = this.constructor as any;
-        return new ThisClass(this.options.getRaw());
+        return new ThisClass(this._options);
     }
 
     public asChild(parent: BaseField, fieldName: string) {
@@ -73,9 +64,9 @@ export class BaseField<T extends BaseFieldOptions = BaseFieldOptions> {
     }
 
     public getDefaultValue(): any {
-        const value = this.options.get('default');
+        const value = this._options.default;
 
-        if (this.options.get('partial')) {
+        if (this._options.partial) {
             throw new Error("Cannot access default value when applying partial parsing and validation.");
         }
 
@@ -91,14 +82,13 @@ export class BaseField<T extends BaseFieldOptions = BaseFieldOptions> {
     }
 
     public getValueToFormat(internalObject: any): any {
-        const source = this.options.get('formatSource') ?? this._fieldName;
+        const source = this._options.formatSource ?? this._fieldName;
         return internalObject[source] ?? null;
     }
 
     @BeforeParse()
     protected validateNull(value: any) {
-        console.log(value)
-        if (value === null && !this.options.get('allowNull')) {
+        if (value === null && !this._options.allowNull) {
             throw new ValidationError([new ValidationIssue('This field may not be null.')]);
         }
 
@@ -107,10 +97,10 @@ export class BaseField<T extends BaseFieldOptions = BaseFieldOptions> {
 
     @BeforeParse()
     protected validateUndefined(value: any) {
-        if (
-            value === undefined &&
-            this.options.get('required') &&
-            this.options.get('default') === undefined) {
+        const isRequired = this._options.required ?? true;
+        const hasDefault = this._options.default !== undefined
+
+        if (value === undefined && isRequired && !hasDefault) {
             throw new ValidationError([new ValidationIssue('This field is required.')]);
         }
 
@@ -165,11 +155,9 @@ export class BaseField<T extends BaseFieldOptions = BaseFieldOptions> {
         return value;
     }
 
-
-
     static bind<
         T extends typeof BaseField,
-        C extends ConstructorParameters<T>[0] & { items?: any }
+        C extends ConstructorParameters<T>[0] & {}
     >(
         this: T,
         args?: C

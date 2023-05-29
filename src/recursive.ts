@@ -18,7 +18,7 @@ export class DeferredField<T extends typeof BaseField = typeof BaseField> {
 
 export function Recursive<T extends typeof BaseField>(
     field: T,
-    options: BaseFieldOptions = {}
+    options?: ConstructorParameters<T>[0]
 ): InstanceType<T> {
-    return new DeferredField(field, options) as any;
+    return new DeferredField(field, options ?? {}) as any;
 }
