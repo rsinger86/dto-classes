@@ -4,17 +4,17 @@ import { OptionsAccessor } from "../options-accessor";
 import { AfterParse } from "../decorators";
 import { ValidationError } from "../exceptions/validation-error";
 
-export interface NumberFieldOptions extends BaseFieldOptions {
+export interface NumberOptions extends BaseFieldOptions {
     maxValue?: number;
     minValue?: number;
 }
 
-export class NumberField<T extends NumberFieldOptions> extends BaseField {
-    public options: OptionsAccessor<NumberFieldOptions>;
+export class NumberField<T extends NumberOptions> extends BaseField {
+    public options: OptionsAccessor<NumberOptions>;
 
     constructor(options?: T) {
         super(options);
-        this.options = new OptionsAccessor<NumberFieldOptions>(options ?? {}, {
+        this.options = new OptionsAccessor<NumberOptions>(options ?? {}, {
             minValue: -Infinity,
             maxValue: Infinity,
             ...BaseFieldDefaults
