@@ -1,9 +1,9 @@
 # Introduction
 
-DTO Classes is a TypeScript-based parsing, validation and serialization library, designed primarily for data transfer objects in an HTTP JSON API.
+DTO Classes is a TypeScript library for parsing, validating and serializing, designed primarily for data transfer objects in HTTP JSON APIs.
 
 It gives you the following, a bundle I've found missing in the TypeScript/Node ecosystem:
-- Class-based schemas that parse/validate and serializes internal objects to JSON
+- Class-based schemas that parse/validate and serialize internal objects to JSON
 - Fields attached to schemas as class properties
 - Static types available by default without an additional `infer` call
 - Custom validation by adding class methods to a schema class
@@ -44,10 +44,37 @@ VS Code:
 ![Alt Text](vs-code-demo-1.gif)
 
 
-
 # Installation
 
 TypeScript 4.5+ is required. 
 
 Run `npm install dto-classes`.
 
+
+# Basic Usage
+
+## Parse & Validate
+
+## Format
+
+# Objects
+
+# Field Types
+
+# Recursive Objects
+
+# Error Handling
+
+# Customization
+
+## Validation
+
+## Formatting
+
+## Fields
+
+# Less Common Scenarios
+
+## Standalone Fields
+
+# NestJS
