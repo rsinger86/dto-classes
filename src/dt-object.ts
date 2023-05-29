@@ -69,7 +69,7 @@ export class DTObject extends BaseField {
         });
     }
 
-    public parse(rawObject: object): this {
+    public async parse(rawObject: object): Promise<this> {
         const errors: ValidationError[] = [];
 
         for (const field of this.getFieldsToParse()) {
@@ -77,7 +77,7 @@ export class DTObject extends BaseField {
             const rawValue = rawObject ? rawObject[fieldName] : undefined;
 
             try {
-                this[fieldName] = field.parse(rawValue)
+                this[fieldName] = await field.parse(rawValue)
             } catch (e) {
                 this[fieldName] = undefined;
                 if (e instanceof ValidationError) {
@@ -96,28 +96,30 @@ export class DTObject extends BaseField {
         return this;
     }
 
-
-    public format(internalObj: any): { [key: string]: any } {
+    public async format(internalObj: any): Promise<{ [key: string]: any }> {
         const formatted = {};
 
         for (const field of this.getFieldsToFormat()) {
             const fieldName = field.getFieldName();
 
             if (isKeyableObject(internalObj)) {
-                const internalValue = field.getValueToFormat(internalObj);
-                formatted[fieldName] = field.format(internalValue);
+                const internalValue = await field.getValueToFormat(internalObj);
+                formatted[fieldName] = await field.format(internalValue);
             } else {
                 formatted[fieldName] = null;
             }
-
         }
 
         for (const formatter of this.getFormatterMethods()) {
             const fieldName = formatter['__FormatterOptions']['fieldName']
-            formatted[fieldName] = formatter.apply(this, [internalObj]);
+            formatted[fieldName] = await formatter.apply(this, [internalObj]);
         }
 
         return formatted;
+    }
+
+    public static async parseNew<T extends DTObject>(this: new (...args: any[]) => T, data: object) {
+        return await new this().parse(data)
     }
 
 }

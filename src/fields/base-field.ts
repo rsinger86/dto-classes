@@ -3,6 +3,7 @@ import { ValidationError } from "../exceptions/validation-error";
 import { ValidationIssue } from "../exceptions/validation-issue";
 import { OptionsAccessor } from "../options-accessor";
 import { BeforeParse, ValidateMethodOptions } from "../decorators";
+import { ParseReturnType } from "../types";
 
 
 export interface BaseFieldOptions {
@@ -28,9 +29,7 @@ export const BaseFieldDefaults = {
 };
 
 
-
-
-export class BaseField<T extends BaseFieldOptions = BaseFieldOptions>  {
+export class BaseField<T extends BaseFieldOptions = BaseFieldOptions> {
     public options: OptionsAccessor<BaseFieldOptions>;
     private _parent: BaseField;
     private _fieldName: string;
@@ -39,18 +38,18 @@ export class BaseField<T extends BaseFieldOptions = BaseFieldOptions>  {
         this.options = new OptionsAccessor<BaseFieldOptions>(options, BaseFieldDefaults);
         const originalParse = this.parse;
 
-        this.parse = (value) => {
-            value = this.beforeParse(value);
+        this.parse = async (value) => {
+            value = await this.beforeParse(value);
 
             if (value === undefined && !this.options.get('partial')) {
                 return this.getDefaultValue();
             }
 
             if (value !== undefined && value !== null) {
-                value = originalParse.apply(this, [value]);
+                value = await originalParse.apply(this, [value]);
             }
 
-            value = this.afterParse(value);
+            value = await this.afterParse(value);
             return value;
         };
     }
@@ -98,6 +97,7 @@ export class BaseField<T extends BaseFieldOptions = BaseFieldOptions>  {
 
     @BeforeParse()
     protected validateNull(value: any) {
+        console.log(value)
         if (value === null && !this.options.get('allowNull')) {
             throw new ValidationError([new ValidationIssue('This field may not be null.')]);
         }
@@ -117,7 +117,7 @@ export class BaseField<T extends BaseFieldOptions = BaseFieldOptions>  {
         return value;
     }
 
-    public beforeParse(value: any) {
+    public async beforeParse(value: any) {
         for (const propName of getAllPropertyNames(this)) {
             const property = this[propName]
 
@@ -126,18 +126,22 @@ export class BaseField<T extends BaseFieldOptions = BaseFieldOptions>  {
             }
 
             const validateMethod = property;
-            value = validateMethod.apply(this, [value])
+            value = await validateMethod.apply(this, [value])
         }
 
         return value;
 
     }
 
-    public parse(value: NonNullable<any>) {
+    public async parse(value: NonNullable<any>): Promise<any> {
         return value;
     }
 
-    public afterParse(value: string) {
+    public async format(value: any): Promise<any> {
+        return String(value);
+    }
+
+    public async afterParse(value: string) {
         for (const propName of getAllPropertyNames(this)) {
             const property = this[propName]
 
@@ -155,30 +159,26 @@ export class BaseField<T extends BaseFieldOptions = BaseFieldOptions>  {
                 continue;
             }
 
-            value = validateMethod.apply(this, [value]);
+            value = await validateMethod.apply(this, [value]);
         }
 
         return value;
     }
 
-    public format(value: any): any {
-        return String(value);
-    }
+
 
     static bind<
         T extends typeof BaseField,
-        C extends ConstructorParameters<T>[0]
+        C extends ConstructorParameters<T>[0] & { items?: any }
     >(
         this: T,
         args?: C
     ):
-        C extends { required: false, allowNull: true } ?
-        ReturnType<InstanceType<T>['parse']> | undefined | null :
-        C extends { allowNull: true } ?
-        ReturnType<InstanceType<T>['parse']> | null :
-        C extends { required: false } ?
-        ReturnType<InstanceType<T>['parse']> | undefined :
-        ReturnType<InstanceType<T>['parse']> {
+        Awaited<
+            C extends { items: any } ?
+            ParseReturnType<Array<C['items']>, C> :
+            ParseReturnType<ReturnType<InstanceType<T>['parse']>, C>
+        > {
         return new this(args ?? {} as any) as any;
     }
 

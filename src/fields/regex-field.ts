@@ -27,22 +27,13 @@ export class RegexField<T extends RegexFieldOptions> extends StringField {
         })
     }
 
+    public async parse(value: any): ParseReturnType<string, T> {
+        value = await super.parse(value);
+        let strValue: string = value;
+        const pattern = this.options.get('pattern');
 
-    public parse(value: any): ParseReturnType<string, T> {
-        const issues: ValidationIssue[] = [];
-        value = super.parse(value);
-
-        if (value !== null) {
-            let strValue: string = value;
-            const pattern = this.options.get('pattern');
-
-            if (!pattern.test(strValue)) {
-                issues.push(new ValidationIssue('This value does not match the required pattern.'))
-            }
-        }
-
-        if (issues.length > 0) {
-            throw new ValidationError(issues);
+        if (!pattern.test(strValue)) {
+            throw new ValidationError('This value does not match the required pattern.');
         }
 
         return value;

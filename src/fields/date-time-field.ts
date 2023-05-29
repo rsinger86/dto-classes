@@ -1,7 +1,6 @@
 import { BaseField, BaseFieldDefaults, BaseFieldOptions } from "./base-field";
 import { ParseReturnType } from "../types";
 import { OptionsAccessor } from "../options-accessor";
-import { ValidationIssue } from "../exceptions/validation-issue";
 import { AfterParse } from "../decorators";
 import { ValidationError } from "../exceptions/validation-error";
 
@@ -24,20 +23,20 @@ export class DateTimeField<T extends DateTimeFieldOptions> extends BaseField {
         })
     }
 
-    public parse(value: any): ParseReturnType<Date, T> {
+    public async parse(value: any): ParseReturnType<Date, T> {
         if (value instanceof Date) {
             return value as any;
         }
 
 
         if (typeof value !== 'string') {
-            throw new ValidationIssue('Invalid date-time passed.');
+            throw new ValidationError('Invalid date-time passed.');
         }
 
         const parsed = Date.parse(value);
 
         if (Number.isNaN(parsed)) {
-            throw new ValidationIssue('Invalid date-time passed.');
+            throw new ValidationError('Invalid date-time passed.');
         }
 
         return new Date(parsed) as any;
@@ -65,7 +64,7 @@ export class DateTimeField<T extends DateTimeFieldOptions> extends BaseField {
         return value;
     }
 
-    public format(value: any): string | null {
+    public async format(value: any): Promise<string | null> {
         if (typeof value === 'string') {
             return value;
         } else if (value instanceof Date) {

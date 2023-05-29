@@ -1,7 +1,6 @@
 import { BaseField, BaseFieldDefaults, BaseFieldOptions } from "./base-field";
 import { ParseReturnType } from "../types";
 import { OptionsAccessor } from "../options-accessor";
-import { ValidationIssue } from "../exceptions/validation-issue";
 import { AfterParse } from "../decorators";
 import { ValidationError } from "../exceptions/validation-error";
 
@@ -22,7 +21,7 @@ export class NumberField<T extends NumberFieldOptions> extends BaseField {
         })
     }
 
-    public parse(value: any): ParseReturnType<number, T> {
+    public async parse(value: any): ParseReturnType<number, T> {
         if (typeof value === 'string' && /^\d+$/.test(value)) {
             value = parseInt(value);
         } else if (typeof value === 'string' && /^[+-]?\d+(\.\d+)?$/.test(value)) {
@@ -30,7 +29,7 @@ export class NumberField<T extends NumberFieldOptions> extends BaseField {
         } else if (typeof value === 'number') {
             value = value;
         } else {
-            throw new ValidationIssue('Invalid number passed.');
+            throw new ValidationError('Invalid number passed.');
         }
 
         return value;
@@ -58,7 +57,7 @@ export class NumberField<T extends NumberFieldOptions> extends BaseField {
         return value;
     }
 
-    public format(value: any) {
+    public async format(value: any) {
         const v = Number(value);
 
         if (Number.isNaN(v)) {

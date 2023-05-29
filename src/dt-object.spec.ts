@@ -14,7 +14,7 @@ describe('test parse', () => {
             lastName = StringField.bind()
         }
 
-        const person = new Person({}).parse({ firstName: 'Robert', lastName: 'Singer' });
+        const person = await new Person({}).parse({ firstName: 'Robert', lastName: 'Singer' });
         expect(person.firstName).toEqual('Robert');
         expect(person.lastName).toEqual('Singer');
     });
@@ -25,7 +25,9 @@ describe('test parse', () => {
             lastName = StringField.bind()
         }
 
-        expect(() => new Person({}).parse({ firstName: 'Robert' })).toThrowError('This field is required.')
+        await expect(
+            async () => await new Person({}).parse({ firstName: 'Robert' })
+        ).rejects.toThrowError('This field is required.')
     });
 
     test('should use default for missing field', async () => {
@@ -34,7 +36,7 @@ describe('test parse', () => {
             lastName = StringField.bind({ "default": "James" })
         }
 
-        const person = new Person().parse({ firstName: 'Robert' });
+        const person = await new Person().parse({ firstName: 'Robert' });
         expect(person.firstName).toEqual('Robert');
         expect(person.lastName).toEqual('James');
     });
@@ -51,7 +53,7 @@ describe('test parse', () => {
             job = Job.bind()
         }
 
-        const person = new Person().parse({ firstName: 'Robert', job: { title: 'Programmer', isSatisfying: true } });
+        const person = await new Person().parse({ firstName: 'Robert', job: { title: 'Programmer', isSatisfying: true } });
         expect(person.firstName).toEqual('Robert');
         expect(person.lastName).toEqual('James');
         expect(person.job.title).toEqual('Programmer');
@@ -77,7 +79,7 @@ describe('test parse', () => {
             job = JobDto.bind()
         }
 
-        const person = new PersonDto().parse({
+        const person = await new PersonDto().parse({
             firstName: 'Robert',
             job: {
                 title: 'Programmer', isSatisfying: true,
@@ -96,6 +98,7 @@ describe('test parse', () => {
         expect(person.job.company.public).toEqual(false);
         expect(person.job.company.dateStarted).toEqual(new Date('1999-06-05'));
     });
+
 });
 
 
@@ -107,7 +110,7 @@ describe('test format', () => {
             password = StringField.bind({ writeOnly: true })
         }
 
-        const data = new Person({}).format({ firstName: 'Robert', lastName: 'Singer', password: '123' });
+        const data = await new Person({}).format({ firstName: 'Robert', lastName: 'Singer', password: '123' });
         expect(data).toEqual({ firstName: 'Robert', lastName: 'Singer' });
     });
 
@@ -118,7 +121,7 @@ describe('test format', () => {
             birthday = DateTimeField.bind({ formatSource: 'dateOfBirth' })
         }
 
-        const data = new Person({}).format({
+        const data = await new Person({}).format({
             firstName: 'Robert',
             lastName: 'Singer',
             dateOfBirth: new Date('1987-11-11')
@@ -139,7 +142,7 @@ describe('test format', () => {
             family = ArrayField.bind({ items: Recursive(Person) })
         }
 
-        const data = new Person({}).format({
+        const data = await new Person({}).format({
             firstName: 'Steve',
             lastName: 'Coolman',
             dateOfBirth: new Date('1960-01-01'),
@@ -213,7 +216,7 @@ describe('test format', () => {
             supervisor = Recursive(StaffMember, { required: false })
         }
 
-        const data = new StaffMember({}).format({
+        const data = await new StaffMember({}).format({
             firstName: 'Robert',
             lastName: 'S',
             supervisor: {
@@ -258,7 +261,7 @@ describe('test format', () => {
             }
         }
 
-        const data = new Person({}).format({
+        const data = await new Person({}).format({
             firstName: 'Steve',
             lastName: 'Coolman',
         });
@@ -277,7 +280,7 @@ describe('test format', () => {
             }
         }
 
-        const data = new Person({}).format({
+        const data = await new Person({}).format({
             firstName: 'Steve',
             lastName: 'Coolman',
         });

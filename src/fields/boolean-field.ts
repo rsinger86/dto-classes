@@ -1,6 +1,7 @@
 import { ValidationError } from "../exceptions/validation-error";
 import { BaseField, BaseFieldOptions } from "./base-field";
 import { ValidationIssue } from "../exceptions/validation-issue";
+import { ParseReturnType } from "src/types";
 
 
 export class BooleanField<T extends BaseFieldOptions> extends BaseField {
@@ -28,11 +29,11 @@ export class BooleanField<T extends BaseFieldOptions> extends BaseField {
         super(options);
     }
 
-    public parse(value: any): T extends { allowNull: true } ? boolean | null : boolean {
+    public async parse(value: any): ParseReturnType<boolean, T> {
         if (this.TRUE_VALUES.includes(value)) {
-            return true;
+            return true as any;
         } else if (this.FALSE_VALUES.includes(value)) {
-            return false;
+            return false as any;
         } else if (this.options.get('allowNull') && this.NULL_VALUES.includes(value)) {
             return null as any;
         }
@@ -40,7 +41,7 @@ export class BooleanField<T extends BaseFieldOptions> extends BaseField {
         throw new ValidationError([new ValidationIssue('Must be a valid boolean.')])
     }
 
-    public format(value: any): boolean {
+    public async format(value: any): Promise<boolean> {
         if (this.TRUE_VALUES.includes(value)) {
             return true;
         } else if (this.FALSE_VALUES.includes(value)) {

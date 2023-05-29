@@ -1,7 +1,7 @@
 import { ValidationIssue } from "../exceptions/validation-issue";
 import { OptionsAccessor } from "../options-accessor";
 import { BaseFieldOptions, BaseField, BaseFieldDefaults } from "./base-field";
-import { ParseReturnType } from "../types";
+import { ParseArrayReturnType } from "../types";
 import { ValidationError } from "../exceptions/validation-error";
 import { AfterParse } from "../decorators";
 import { DeferredField } from "../recursive";
@@ -9,25 +9,25 @@ import { DeferredField } from "../recursive";
 
 
 export interface ArrayOptions extends BaseFieldOptions {
-    items: BaseField
+    items: any;
     maxLength?: number | null;
     minLength?: number | null;
 }
 
-export class ArrayField<T extends ArrayOptions> extends BaseField {
+export class ArrayField<T extends ArrayOptions = ArrayOptions> extends BaseField {
     public options: OptionsAccessor<ArrayOptions>;
 
     constructor(options: T) {
         super(options);
         this.options = new OptionsAccessor<ArrayOptions>(options, {
+            items: undefined,
             maxLength: null,
             minLength: null,
-            items: null as any,
             ...BaseFieldDefaults
         })
     }
 
-    public parse(value: any): ParseReturnType<Array<T['items']>, T> {
+    public async parse(value: any): ParseArrayReturnType<T> {
         const parsedItems: any[] = [];
         const itemField = this.options.get('items') as BaseField;
 
@@ -36,14 +36,10 @@ export class ArrayField<T extends ArrayOptions> extends BaseField {
         }
 
         for (const v of value) {
-            parsedItems.push(itemField.parse(v))
+            parsedItems.push(await itemField.parse(v))
         }
 
         return parsedItems as any;
-    }
-
-    public async parseAsync(value: any): Promise<ParseReturnType<Array<T['items']>, T>> {
-        return await this.parse(value);
     }
 
     @AfterParse({ receieveNull: false })
@@ -69,7 +65,7 @@ export class ArrayField<T extends ArrayOptions> extends BaseField {
     }
 
 
-    public format(value: any): any[] {
+    public async format(value: any): Promise<any[]> {
         const formattedItems: any[] = [];
         let itemField = this.options.get('items') as any;
 
@@ -82,7 +78,7 @@ export class ArrayField<T extends ArrayOptions> extends BaseField {
         }
 
         for (const v of value) {
-            formattedItems.push(itemField.format(v))
+            formattedItems.push(await itemField.format(v))
         }
 
         return formattedItems;
