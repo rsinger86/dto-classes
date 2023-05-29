@@ -11,18 +11,34 @@ import { Recursive } from "./recursive";
 class UserDto extends DTObject {
     firstName = StringField.bind()
     lastName = StringField.bind()
-    joinedAt = DateTimeField.bind({ readOnly: true })
+    nickName = StringField.bind({ required: false })
+    birthday = DateTimeField.bind()
     active = BooleanField.bind({ default: true })
-    hobbies = ArrayField.bind({ items: StringField.bind(), required: true })
+    hobbies = ArrayField.bind({ items: StringField.bind() })
     favoriteColor = StringField.bind({ allowNull: true })
 }
 
-const userDto = UserDto.parseNew({})
+async function main() {
+    const userDto = await UserDto.parseNew({
+        firstName: "Michael",
+        lastName: "Scott",
+        birthday: '1962-08-16',
+        hobbies: ["Comedy", "Paper"],
+        favoriteColor: "Red"
+    })
 
-userDto.firstName
-userDto.lastName
-userDto.joinedAt
-userDto.active
-userDto.hobbies
-userDto.favoriteColor
+
+
+    userDto.firstName
+    userDto.lastName
+    userDto.nickName
+    userDto.birthday
+    userDto.active
+    userDto.hobbies
+    userDto.favoriteColor
+
+
+
+}
+
 
