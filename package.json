@@ -1,14 +1,20 @@
 {
   "name": "dto-classes",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "Classes for data transfer objects.",
-  "main": "index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
+    "build": "tsc",
     "start:dev": "npx nodemon",
     "test": "jest",
-    "test:dev": "jest --watchAll"
+    "test:dev": "jest --watchAll",
+    "prepare": "npm run build",
+    "prepublishOnly": "npm test",
+    "version": "git add -A src",
+    "postversion": "git push && git push --tags"
   },
-  "author": "",
+  "homepage": "https://github.com/rsinger86/dto-classes",
+  "author": "Robert Singer",
   "license": "ISC",
   "devDependencies": {
     "@types/jest": "^29.5.1",
@@ -18,5 +24,11 @@
     "ts-jest": "^29.1.0",
     "ts-node": "^10.9.1",
     "typescript": "^5.0.4"
+  },
+  "files": [
+    "dist/**/*"
+  ],
+  "exports": {
+    ".": "./dist/index.js"
   }
 }

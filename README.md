@@ -53,15 +53,13 @@ Run `npm install dto-classes`.
 
 # Basic Usage
 
-## Parse & Validate
+## Parsing & Validating
 
-## Format
+## Formatting
 
 # Objects
 
 # Field Types
-
-# Recursive Objects
 
 # Error Handling
 
@@ -74,6 +72,8 @@ Run `npm install dto-classes`.
 ## Fields
 
 # Less Common Scenarios
+
+## Recursive Objects
 
 ## Standalone Fields
 
