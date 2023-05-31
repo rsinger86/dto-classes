@@ -1,7 +1,7 @@
 import { getAllPropertyNames } from "../utils";
 import { ValidationError } from "../exceptions/validation-error";
 import { ValidationIssue } from "../exceptions/validation-issue";
-import { BeforeParse, ValidateMethodOptions } from "../decorators";
+import { BeforeParse, IS_POST_PARSER_KEY, IS_PREPARSER_KEY, POST_PARSER_OPTIONS_KEY, ValidateMethodOptions } from "../decorators";
 import { ParseReturnType } from "../types";
 
 
@@ -111,7 +111,7 @@ export class BaseField {
         for (const propName of getAllPropertyNames(this)) {
             const property = this[propName]
 
-            if (!property || !property['__isPreparser']) {
+            if (!property || !property[IS_PREPARSER_KEY]) {
                 continue;
             }
 
@@ -132,11 +132,11 @@ export class BaseField {
         for (const propName of getAllPropertyNames(this)) {
             const property = this[propName]
 
-            if (!property || !property['__isPostParser']) {
+            if (!property || !property[IS_POST_PARSER_KEY]) {
                 continue;
             }
 
-            const options: ValidateMethodOptions = property['__PostParserOptions'];
+            const options: ValidateMethodOptions = property[POST_PARSER_OPTIONS_KEY];
             const validateMethod = property;
             const isNull = value === null;
             const isEmpty = (value === '' || value === null || value === undefined);

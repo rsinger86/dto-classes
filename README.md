@@ -48,18 +48,109 @@ VS Code:
 
 TypeScript 4.5+ is required. 
 
-Run `npm install dto-classes`.
+Run: `npm install dto-classes`
 
-
+You'll get more accurate type hints with strict null checks in your `tsconfig.json`:
+```jsonc
+{
+  "compilerOptions": {
+    // ...
+    "strictNullChecks": true
+    // ...
+}
+```
 # Basic Usage
 
 ## Parsing & Validating
 
+Let's start by defining some schema classes. Extend the `DTObject` class and define its fields:
+
+```typescript
+import { DTObject, StringField, DateTimeField } from 'dto-classes';
+
+class DirectorDto extends DTObject {
+    name = StringField.bind()
+}
+
+class MovieDto extends DTObject {
+    title = StringField.bind()
+    releaseDate = DateTimeField.bind()
+    director = ArtistDto.bind(),
+    genre = StringField.bind({required: false})
+}
+```
+
+There's some incoming data:
+```typescript
+const data = {
+    "title": "The Departed",
+    "releaseDate": '2006-10-06',
+    "director": {"name": "Martin Scorsese"}
+}
+```
+
+We can parse and validate the data by calling the static method `parseNew(data)` which will return a newly created DTO instance:
+
+```typescript
+const movieDto = await MovieDto.parseNew(data);
+```
+
+If it succeeds, it will return a strongly typed instance of the class.
+
+If it fails, it will raise a validation error:
+
+```typescript
+import { ValidationError } from "dto-classes";
+
+try {
+    const movieDto = await MovieDto.parseNew(data);
+} catch (error) {
+    if (error instanceof ValidationError) {
+        // 
+    }
+}
+```
+
 ## Formatting
 
-# Objects
+You can also format internal data types to JSON data that can be returned in an HTTP response.
 
-# Field Types
+A common example is model instances originating from an ORM:
+
+```typescript
+const movie = await repo.fetchMovie(45).join('director')
+const jsonData = await MovieDto.format(movie);
+return HttpResponse(jsonData);
+```
+
+Special types, like JavaScript's Date object, will be converted to JSON compatible output:
+```json
+{
+    "title": "The Departed",
+    "releaseDate": "2006-10-06",
+    "director": {"name": "Martin Scorsese"}
+}
+```
+
+Importantly, any internal properties not specified will be ommitted from the formatted output.
+
+# Fields
+
+Field handle converting between primitive values and internal datatypes. They also deal with validating input values. They are attached to a `DTObject` using the `bind(options)` static method. 
+
+All field types accept some core options:
+
+```typescript
+interface BaseFieldOptions {
+    required?: boolean;  // Whether an input value is required; default is false
+    allowNull?: boolean; // Whether null input values are allowed; default is false
+    readOnly?: boolean;  // If true, the field is included in the format() output, but ignored when parsing; default is false
+    writeOnly?: boolean; // If true, the field is parsed/validated, but excluded in the format() output
+    default?: any;
+    partial?: boolean;
+    formatSource?: string | null; // The property name on the internal object to pull when formatting; only use if different from the DTO field name
+}
+```
 
 # Error Handling
 

@@ -1,5 +1,6 @@
 import { AfterParse, Format } from "./decorators";
 import { DTObject } from "./dt-object";
+import { ValidationError } from "./exceptions/validation-error";
 import { ArrayField } from "./fields/array-field";
 import { BooleanField } from "./fields/boolean-field";
 import { DateTimeField } from "./fields/date-time-field";
@@ -123,6 +124,70 @@ describe('test getValues', () => {
             lastName: 'James',
             job: { title: 'Programmer', isSatisfying: true }
         });
+    });
+});
+
+describe('test decorated method calls', () => {
+    test('should raise error from custom validate method', async () => {
+        class Job extends DTObject {
+            title = StringField.bind()
+            isSatisfying = BooleanField.bind()
+        }
+
+        class Person extends DTObject {
+            firstName = StringField.bind()
+            lastName = StringField.bind({ "default": "James" })
+            job = Job.bind()
+
+            @AfterParse()
+            customValidate(value: this) {
+                if (value.firstName === 'Robert') {
+                    throw new ValidationError("Can't use that name")
+                }
+            }
+        }
+
+        const f = async () => {
+            await new Person().parse({ firstName: 'Robert', job: { title: 'Programmer', isSatisfying: true } });
+        };
+
+        await expect(f).rejects.toThrow("Can't use that name")
+    });
+
+    test('should raise error from nested custom validate method', async () => {
+        class Job extends DTObject {
+            title = StringField.bind()
+            isSatisfying = BooleanField.bind()
+
+            @AfterParse()
+            customValidate(value: this) {
+                if (value.isSatisfying) {
+                    throw new ValidationError("Can't have a satisfying job")
+                }
+            }
+        }
+
+        class Person extends DTObject {
+            firstName = StringField.bind()
+            lastName = StringField.bind({ "default": "James" })
+            job = Job.bind()
+
+
+        }
+
+        let correctExceptionFound = false;
+
+        try {
+            await new Person().parse({ firstName: 'Robert', job: { title: 'Programmer', isSatisfying: true } });
+        } catch (e: any) {
+            if (e instanceof ValidationError) {
+                expect(e.issues[0].path).toEqual(['job']);
+                expect(e.issues[0].message).toEqual("Can't have a satisfying job")
+                correctExceptionFound = true;
+            }
+        }
+
+        expect(correctExceptionFound).toBeTruthy()
     });
 });
 

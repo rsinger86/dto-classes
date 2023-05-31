@@ -1,3 +1,8 @@
+export const IS_POST_PARSER_KEY = '__isPostParser';
+export const POST_PARSER_OPTIONS_KEY = '__PostParserOptions';
+export const IS_PREPARSER_KEY = '__isPreparser';
+export const IS_FORMATTER_KEY = '__isFormatter';
+export const FORMATTER_OPTIONS_KEY = '__FormatterOptions';
 
 
 export interface ValidateMethodOptions {
@@ -6,15 +11,15 @@ export interface ValidateMethodOptions {
 
 export const AfterParse = (options: ValidateMethodOptions = {}) => {
     return (target: any, memberName: string, propertyDescriptor: PropertyDescriptor) => {
-        target[memberName]['__isPostParser'] = true;
-        target[memberName]['__PostParserOptions'] = options ?? {};
+        target[memberName][IS_POST_PARSER_KEY] = true;
+        target[memberName][POST_PARSER_OPTIONS_KEY] = options ?? {};
         return target;
     }
 }
 
 export const BeforeParse = (options: {} = {}) => {
     return (target: any, memberName: string, propertyDescriptor: PropertyDescriptor) => {
-        target[memberName]['__isPreparser'] = true;
+        target[memberName][IS_PREPARSER_KEY] = true;
         return target;
     }
 }
@@ -26,8 +31,8 @@ export const Format = (options: { fieldName?: string } = {}) => {
             options.fieldName = target[memberName].name
         }
 
-        target[memberName]['__isFormatter'] = true;
-        target[memberName]['__FormatterOptions'] = options;
+        target[memberName][IS_FORMATTER_KEY] = true;
+        target[memberName][FORMATTER_OPTIONS_KEY] = options;
         return target;
     }
 }

@@ -1,6 +1,8 @@
+import { FORMATTER_OPTIONS_KEY, IS_FORMATTER_KEY } from "./decorators";
 import { ValidationError } from "./exceptions/validation-error";
 import { BaseField, BaseFieldOptions } from "./fields/base-field";
 import { DeferredField } from "./recursive";
+import { ParseDtoReturnType } from "./types";
 import { getAllPropertyNames, isKeyableObject } from "./utils";
 
 
@@ -49,7 +51,7 @@ export class DTObject extends BaseField {
         for (const propName of getAllPropertyNames(this)) {
             const property = this[propName] as any;
 
-            if (property && property['__isFormatter']) {
+            if (property && property[IS_FORMATTER_KEY]) {
                 methods.push(property);
             }
         }
@@ -69,7 +71,7 @@ export class DTObject extends BaseField {
         });
     }
 
-    public async parse(rawObject: object): Promise<this> {
+    public async parse(rawObject: object): ParseDtoReturnType<this> {
         const errors: ValidationError[] = [];
         this._parsedValues = {};
 
@@ -132,7 +134,7 @@ export class DTObject extends BaseField {
         }
 
         for (const formatter of this.getFormatterMethods()) {
-            const fieldName = formatter['__FormatterOptions']['fieldName']
+            const fieldName = formatter[FORMATTER_OPTIONS_KEY]['fieldName']
             formatted[fieldName] = await formatter.apply(this, [internalObj]);
         }
 
