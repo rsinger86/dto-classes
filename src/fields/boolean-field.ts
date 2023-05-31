@@ -1,7 +1,7 @@
 import { ValidationError } from "../exceptions/validation-error";
 import { BaseField, BaseFieldOptions } from "./base-field";
 import { ValidationIssue } from "../exceptions/validation-issue";
-import { ParseReturnType } from "src/types";
+import { ParseReturnType } from "../types";
 
 
 export class BooleanField<T extends BaseFieldOptions = BaseFieldOptions> extends BaseField {

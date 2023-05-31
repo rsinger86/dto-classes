@@ -102,6 +102,30 @@ describe('test parse', () => {
 });
 
 
+describe('test getValues', () => {
+    test('should getValues of nested object', async () => {
+        class Job extends DTObject {
+            title = StringField.bind()
+            isSatisfying = BooleanField.bind()
+        }
+
+        class Person extends DTObject {
+            firstName = StringField.bind()
+            lastName = StringField.bind({ "default": "James" })
+            job = Job.bind()
+        }
+
+        const person = await new Person().parse({ firstName: 'Robert', job: { title: 'Programmer', isSatisfying: true } });
+        const plainData = person.getValues()
+
+        expect(plainData).toEqual({
+            firstName: 'Robert',
+            lastName: 'James',
+            job: { title: 'Programmer', isSatisfying: true }
+        });
+    });
+});
+
 describe('test format', () => {
     test('format should exclude write only fields', async () => {
         class Person extends DTObject {

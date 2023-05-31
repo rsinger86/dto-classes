@@ -7,7 +7,7 @@ import { getAllPropertyNames, isKeyableObject } from "./utils";
 
 export class DTObject extends BaseField {
     public _options: any;
-
+    private _parsedValues: { [key: string]: any } | null = null;
     private _fields: Array<BaseField | DTObject> = [];
 
     constructor(options?: BaseFieldOptions) {
@@ -71,13 +71,15 @@ export class DTObject extends BaseField {
 
     public async parse(rawObject: object): Promise<this> {
         const errors: ValidationError[] = [];
+        this._parsedValues = {};
 
         for (const field of this.getFieldsToParse()) {
             const fieldName = field.getFieldName();
             const rawValue = rawObject ? rawObject[fieldName] : undefined;
 
             try {
-                this[fieldName] = await field.parse(rawValue)
+                this[fieldName] = await field.parse(rawValue);
+                this._parsedValues[fieldName] = this[fieldName];
             } catch (e) {
                 this[fieldName] = undefined;
                 if (e instanceof ValidationError) {
@@ -94,6 +96,25 @@ export class DTObject extends BaseField {
         }
 
         return this;
+    }
+
+    public getValues(): { [key: string]: any } {
+        if (this._parsedValues === null) {
+            throw new Error("Must call parse() before getValues()")
+        }
+
+        const plain = {};
+
+        for (const key in this._parsedValues) {
+            let value = this._parsedValues[key];
+
+            if (value instanceof DTObject) {
+                value = value.getValues();
+            }
+
+            plain[key] = value;
+        }
+        return plain
     }
 
     public async format(internalObj: any): Promise<{ [key: string]: any }> {

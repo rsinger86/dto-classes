@@ -45,7 +45,7 @@ export class BaseField {
     }
 
 
-    public clone() {
+    protected clone() {
         const ThisClass = this.constructor as any;
         return new ThisClass(this._options);
     }
@@ -107,7 +107,7 @@ export class BaseField {
         return value;
     }
 
-    public async beforeParse(value: any) {
+    protected async beforeParse(value: any) {
         for (const propName of getAllPropertyNames(this)) {
             const property = this[propName]
 
@@ -123,15 +123,7 @@ export class BaseField {
 
     }
 
-    public async parse(value: NonNullable<any>): Promise<any> {
-        return value;
-    }
-
-    public async format(value: any): Promise<any> {
-        return String(value);
-    }
-
-    public async afterParse(value: string) {
+    protected async afterParse(value: string) {
         for (const propName of getAllPropertyNames(this)) {
             const property = this[propName]
 
@@ -153,6 +145,13 @@ export class BaseField {
         }
 
         return value;
+    }
+    public async parse(value: NonNullable<any>): Promise<any> {
+        return value;
+    }
+
+    public async format(value: any): Promise<any> {
+        return String(value);
     }
 
     static bind<

@@ -1,4 +1,4 @@
-import { ValidationError } from "src/exceptions/validation-error";
+import { ValidationError } from "../exceptions/validation-error";
 import { BooleanField } from "./boolean-field";
 
 describe('parse tests', () => {

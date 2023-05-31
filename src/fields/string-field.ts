@@ -2,7 +2,7 @@ import { ValidationError } from "../exceptions/validation-error";
 import { BaseField, BaseFieldOptions } from "./base-field";
 import { ParseReturnType } from "../types";
 import { AfterParse } from "../decorators";
-import { REGEX_PATTERNS } from "src/regex";
+import { REGEX_PATTERNS } from "../regex";
 
 
 export interface StringOptions extends BaseFieldOptions {
