@@ -1,4 +1,4 @@
-import { Format } from "./decorators";
+import { AfterParse, Format } from "./decorators";
 import { DTObject } from "./dt-object";
 import { ArrayField } from "./fields/array-field";
 import { BooleanField } from "./fields/boolean-field";
@@ -125,6 +125,30 @@ describe('test getValues', () => {
         });
     });
 });
+
+describe('test custom validators', () => {
+    test('should getValues of nested object', async () => {
+        class Job extends DTObject {
+            title = StringField.bind()
+            isSatisfying = BooleanField.bind()
+        }
+
+        class Person extends DTObject {
+            firstName = StringField.bind()
+            lastName = StringField.bind({ "default": "James" })
+            job = Job.bind()
+
+            @AfterParse()
+            validateNamesDifferent() {
+
+            }
+        }
+
+        const person = await new Person().parse({ firstName: 'Robert', job: { title: 'Programmer', isSatisfying: true } });
+
+    });
+});
+
 
 describe('test format', () => {
     test('format should exclude write only fields', async () => {

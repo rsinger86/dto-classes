@@ -34,7 +34,7 @@ export class DTObject extends BaseField {
                 }
 
                 const clonedField = attribute.clone();
-                clonedField.asChild(this, attrName);
+                clonedField._asChild(this, attrName);
                 fields.push(clonedField)
             }
         }
@@ -74,7 +74,7 @@ export class DTObject extends BaseField {
         this._parsedValues = {};
 
         for (const field of this.getFieldsToParse()) {
-            const fieldName = field.getFieldName();
+            const fieldName = field._getFieldName();
             const rawValue = rawObject ? rawObject[fieldName] : undefined;
 
             try {
@@ -121,7 +121,7 @@ export class DTObject extends BaseField {
         const formatted = {};
 
         for (const field of this.getFieldsToFormat()) {
-            const fieldName = field.getFieldName();
+            const fieldName = field._getFieldName();
 
             if (isKeyableObject(internalObj)) {
                 const internalValue = await field.getValueToFormat(internalObj);

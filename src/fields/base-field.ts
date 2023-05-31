@@ -32,7 +32,7 @@ export class BaseField {
             value = await this.beforeParse(value);
 
             if (value === undefined && !this._options.partial) {
-                return this.getDefaultValue();
+                return this._getDefaultValue();
             }
 
             if (value !== undefined && value !== null) {
@@ -50,20 +50,20 @@ export class BaseField {
         return new ThisClass(this._options);
     }
 
-    public asChild(parent: BaseField, fieldName: string) {
+    public _asChild(parent: BaseField, fieldName: string) {
         this._parent = parent;
         this._fieldName = fieldName;
     }
 
-    public getFieldName(): string {
+    public _getFieldName(): string {
         return this._fieldName;
     }
 
-    public getParent(): BaseField {
+    public _getParent(): BaseField {
         return this._parent;
     }
 
-    public getDefaultValue(): any {
+    public _getDefaultValue(): any {
         const value = this._options.default;
 
         if (this._options.partial) {
@@ -116,7 +116,12 @@ export class BaseField {
             }
 
             const validateMethod = property;
-            value = await validateMethod.apply(this, [value])
+            const validatedValue = await validateMethod.apply(this, [value]);
+
+            // Only assign the new value if the method returns
+            if (validatedValue !== undefined) {
+                value = validatedValue;
+            }
         }
 
         return value;
@@ -141,7 +146,12 @@ export class BaseField {
                 continue;
             }
 
-            value = await validateMethod.apply(this, [value]);
+            const validatedValue = await validateMethod.apply(this, [value]);
+
+            // Only assign the new value if the method returns
+            if (validatedValue !== undefined) {
+                value = validatedValue;
+            }
         }
 
         return value;
