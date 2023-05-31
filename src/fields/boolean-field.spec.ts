@@ -6,7 +6,7 @@ describe('parse tests', () => {
         const boolSchema = new BooleanField({ allowNull: true });
 
         for (const v of ['null', 'Null', 'NULL', '', null]) {
-            const value = await boolSchema.parse(v);
+            const value = await boolSchema.parseValue(v);
             expect(value).toEqual(null);
         }
     });
@@ -16,7 +16,7 @@ describe('parse tests', () => {
 
         for (const v of ['null', 'Null', 'NULL', '', null]) {
             const t = async () => {
-                await boolSchema.parse(v);
+                await boolSchema.parseValue(v);
 
             }
             await expect(t).rejects.toThrow(ValidationError);
@@ -34,7 +34,7 @@ describe('parse tests', () => {
             '0', 0, 0.0,
             false
         ]) {
-            const value = await boolSchema.parse(v);
+            const value = await boolSchema.parseValue(v);
             expect(value).toEqual(false);
         }
     });
@@ -50,7 +50,7 @@ describe('parse tests', () => {
             '1', 1,
             true
         ]) {
-            const value = await boolSchema.parse(v);
+            const value = await boolSchema.parseValue(v);
             expect(value).toEqual(true);
         }
     });
@@ -62,7 +62,7 @@ describe('format tests', () => {
         const boolSchema = new BooleanField({ allowNull: true });
 
         for (const v of ['null', 'Null', 'NULL', '', null]) {
-            const value = await boolSchema.format(v);
+            const value = await boolSchema.formatValue(v);
             expect(value).toEqual(null);
         }
     });
@@ -78,7 +78,7 @@ describe('format tests', () => {
             '0', 0, 0.0,
             false
         ]) {
-            const value = await boolSchema.format(v);
+            const value = await boolSchema.formatValue(v);
             expect(value).toEqual(false);
         }
     });
@@ -94,7 +94,7 @@ describe('format tests', () => {
             '1', 1,
             true
         ]) {
-            const value = await boolSchema.parse(v);
+            const value = await boolSchema.parseValue(v);
             expect(value).toEqual(true);
         }
     });

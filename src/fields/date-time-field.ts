@@ -16,7 +16,7 @@ export class DateTimeField<T extends DateTimeFieldOptions> extends BaseField {
         super(options);
     }
 
-    public async parse(value: any): ParseReturnType<Date, T> {
+    public async parseValue(value: any): ParseReturnType<Date, T> {
         if (value instanceof Date) {
             return value as any;
         }
@@ -57,7 +57,7 @@ export class DateTimeField<T extends DateTimeFieldOptions> extends BaseField {
         return value;
     }
 
-    public async format(value: any): Promise<string | null> {
+    public async formatValue(value: any): Promise<string | null> {
         if (typeof value === 'string') {
             return value;
         } else if (value instanceof Date) {

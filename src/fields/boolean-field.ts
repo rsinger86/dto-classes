@@ -31,7 +31,7 @@ export class BooleanField<T extends BaseFieldOptions = BaseFieldOptions> extends
         super(options);
     }
 
-    public async parse(value: any): ParseReturnType<boolean, T> {
+    public async parseValue(value: any): ParseReturnType<boolean, T> {
         if (this.TRUE_VALUES.includes(value)) {
             return true as any;
         } else if (this.FALSE_VALUES.includes(value)) {
@@ -43,7 +43,7 @@ export class BooleanField<T extends BaseFieldOptions = BaseFieldOptions> extends
         throw new ValidationError([new ValidationIssue('Must be a valid boolean.')])
     }
 
-    public async format(value: any): Promise<boolean> {
+    public async formatValue(value: any): Promise<boolean> {
         if (this.TRUE_VALUES.includes(value)) {
             return true;
         } else if (this.FALSE_VALUES.includes(value)) {

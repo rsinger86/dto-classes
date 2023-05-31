@@ -19,19 +19,43 @@ export class ArrayField<T extends ArrayOptions> extends BaseField {
         super(options);
     }
 
-    public async parse(value: any): ParseArrayReturnType<T> {
+    public async parseValue(value: any): ParseArrayReturnType<T> {
         const parsedItems: any[] = [];
-        const itemField = this._options.items as BaseField;
+        let itemField = this._options.items as BaseField;
 
         if (!Array.isArray(value)) {
             throw new ValidationIssue(`Ensure value is an array.`)
         }
 
+        if (itemField instanceof DeferredField) {
+            itemField = itemField.construct()
+        }
+
         for (const v of value) {
-            parsedItems.push(await itemField.parse(v))
+            parsedItems.push(await itemField.parseValue(v))
         }
 
         return parsedItems as any;
+    }
+
+    public async formatValue(value: any): Promise<any[]> {
+        const formattedItems: any[] = [];
+        let itemField = this._options.items as BaseField;
+
+        if (!Array.isArray(value)) {
+            return [];
+        }
+
+        if (itemField instanceof DeferredField) {
+            itemField = itemField.construct()
+        }
+
+        for (const v of value) {
+            const formattedValue = await itemField.formatValue(v);
+            formattedItems.push(formattedValue)
+        }
+
+        return formattedItems;
     }
 
     @AfterParse({ receieveNull: false })
@@ -54,26 +78,6 @@ export class ArrayField<T extends ArrayOptions> extends BaseField {
         }
 
         return value;
-    }
-
-
-    public async format(value: any): Promise<any[]> {
-        const formattedItems: any[] = [];
-        let itemField = this._options.items as any;
-
-        if (!Array.isArray(value)) {
-            return [];
-        }
-
-        if (itemField instanceof DeferredField) {
-            itemField = itemField.construct()
-        }
-
-        for (const v of value) {
-            formattedItems.push(await itemField.format(v))
-        }
-
-        return formattedItems;
     }
 
 }

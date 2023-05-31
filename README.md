@@ -30,7 +30,7 @@ class UserDto extends DTObject {
     favoriteColor = StringField.bind({ allowNull: true })
 }
 
-const userDto = await UserDto.parseNew({
+const userDto = await UserDto.parse({
     firstName: "Michael",
     lastName: "Scott",
     birthday: '1962-08-16',
@@ -89,10 +89,10 @@ const data = {
 }
 ```
 
-We can parse and validate the data by calling the static method `parseNew(data)` which will return a newly created DTO instance:
+We can parse and validate the data by calling the static method `parse(data)` which will return a newly created DTO instance:
 
 ```typescript
-const movieDto = await MovieDto.parseNew(data);
+const movieDto = await MovieDto.parse(data);
 ```
 
 If it succeeds, it will return a strongly typed instance of the class.
@@ -103,7 +103,7 @@ If it fails, it will raise a validation error:
 import { ValidationError } from "dto-classes";
 
 try {
-    const movieDto = await MovieDto.parseNew(data);
+    const movieDto = await MovieDto.parse(data);
 } catch (error) {
     if (error instanceof ValidationError) {
         // 

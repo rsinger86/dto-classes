@@ -24,11 +24,11 @@ export class BaseField {
     private _parent: BaseField;
     private _fieldName: string;
 
-    constructor(options?: BaseFieldOptions) {
+    constructor(options: BaseFieldOptions = {}) {
         this._options = options ?? {};
-        const originalParse = this.parse;
+        const originalParse = this.parseValue;
 
-        this.parse = async (value) => {
+        this.parseValue = async (value) => {
             value = await this.beforeParse(value);
 
             if (value === undefined && !this._options.partial) {
@@ -156,11 +156,11 @@ export class BaseField {
 
         return value;
     }
-    public async parse(value: NonNullable<any>): Promise<any> {
+    public async parseValue(value: NonNullable<any>): Promise<any> {
         return value;
     }
 
-    public async format(value: any): Promise<any> {
+    public async formatValue(value: any): Promise<any> {
         return String(value);
     }
 
@@ -174,9 +174,34 @@ export class BaseField {
         Awaited<
             C extends { items: any } ?
             ParseReturnType<Array<C['items']>, C> :
-            ParseReturnType<ReturnType<InstanceType<T>['parse']>, C>
+            ParseReturnType<ReturnType<InstanceType<T>['parseValue']>, C>
         > {
         return new this(args ?? {} as any) as any;
+    }
+
+    static async parse<
+        T extends typeof BaseField,
+        C extends ConstructorParameters<T>[0] & {}
+    >(
+        this: T,
+        data: any,
+        args?: C
+    ): Promise<C extends { items: any } ? ParseReturnType<Array<C['items']>, C> :
+        ParseReturnType<ReturnType<InstanceType<T>['parseValue']>, C>> {
+        const instance = new this(args ?? {} as any) as any;
+        return await instance.toInternal(data);
+    }
+
+    static async format<
+        T extends typeof BaseField,
+        C extends ConstructorParameters<T>[0] & {}
+    >(
+        this: T,
+        internalObj: any,
+        args?: C
+    ): Promise<{ [key: string]: any }> {
+        const instance = new this(args ?? {} as any) as any;
+        return await instance.toRepresentation(internalObj);
     }
 
 }

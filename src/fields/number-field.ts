@@ -15,7 +15,7 @@ export class NumberField<T extends NumberOptions> extends BaseField {
         super(options);
     }
 
-    public async parse(value: any): ParseReturnType<number, T> {
+    public async parseValue(value: any): ParseReturnType<number, T> {
         if (typeof value === 'string' && /^\d+$/.test(value)) {
             value = parseInt(value);
         } else if (typeof value === 'string' && /^[+-]?\d+(\.\d+)?$/.test(value)) {
@@ -51,7 +51,7 @@ export class NumberField<T extends NumberOptions> extends BaseField {
         return value;
     }
 
-    public async format(value: any) {
+    public async formatValue(value: any) {
         const v = Number(value);
 
         if (Number.isNaN(v)) {

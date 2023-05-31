@@ -21,7 +21,7 @@ export class StringField<T extends StringOptions = StringOptions> extends BaseFi
         super(options);
     }
 
-    public async parse(value: any): ParseReturnType<string, T> {
+    public async parseValue(value: any): ParseReturnType<string, T> {
         const validTypes = ['number', 'string'];
 
         if (!validTypes.includes(typeof value)) {
@@ -98,7 +98,7 @@ export class StringField<T extends StringOptions = StringOptions> extends BaseFi
         return value;
     }
 
-    public async format(value: any): Promise<string> {
+    public async formatValue(value: any): Promise<string> {
         return String(value);
     }
 
