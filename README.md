@@ -164,8 +164,8 @@ interface BaseFieldOptions {
 
 ## StringField
 
-- Parses input to strings. Coerces numbers, other types invalid. 
-- Formats all value types to strings.
+- Parses input to _strings_. Coerces numbers, other types invalid. 
+- Formats all value types to _strings_.
 
 ```typescript
 interface StringOptions extends BaseFieldOptions {
@@ -188,8 +188,8 @@ interface StringOptions extends BaseFieldOptions {
 
 ## BooleanField
 
-- Parses input to booleans. Coerces certain bool-y strings. Other types invalid.
-- Formats values to booleans.
+- Parses input to _booleans_. Coerces certain bool-y strings. Other types invalid.
+- Formats values to _booleans_.
 
 Truthy inputs:
 ```typescript
@@ -203,8 +203,8 @@ Falsey inputs:
 
 ## NumberField
 
-- Parses input to numbers. Coerces numeric strings. Other types invalid.
-- Formats values to numbers.
+- Parses input to _numbers_. Coerces numeric strings. Other types invalid.
+- Formats values to _numbers_.
 
 ```typescript
 interface NumberOptions extends BaseFieldOptions {
@@ -222,8 +222,8 @@ interface NumberOptions extends BaseFieldOptions {
 
 ## DateTimeField
 
-- Parses input to `Date` instances. Coercing date-ish strings using `Date.parse()`. 
-- Formats values to strings with `Date.toISOString()`.
+- Parses input to _`Date` instances_. Coercing date-ish strings using `Date.parse()`. 
+- Formats values to _strings_ with `Date.toISOString()`.
 
 ```typescript
 interface DateTimeFieldOptions extends BaseFieldOptions {
