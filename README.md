@@ -166,7 +166,7 @@ interface BaseFieldOptions {
 | default     | The default value to use during parsing if none is present in the input | n/a |
 | formatSource  | The name of the attribute that will be used to populate the field, if different from the formatted field name name | n/a  |
 
-## StringField: string
+## StringField: `string`
 
 - Parses input to _strings_. Coerces numbers, other types invalid. 
 - Formats all value types to _strings_.
@@ -190,7 +190,7 @@ interface StringOptions extends BaseFieldOptions {
 | pattern     | A `Regex` that the input must match or a ValidationError will be thrown. | n/a |
 | format  | A predefined format that the input must conform to or a ValidationError will be thrown. Supported values: `email`, `url`. | n/a  |
 
-## BooleanField: boolean
+## BooleanField: `boolean`
 
 - Parses input to _booleans_. Coerces certain bool-y strings. Other types invalid.
 - Formats values to _booleans_.
@@ -205,7 +205,7 @@ Falsey inputs:
 ['f', 'F', 'n', 'N', 'no', 'No', 'NO', 'false', 'False', 'FALSE', 'off', 'Off', 'OFF', '0', 0, 0.0, false]
 ```
 
-## NumberField: number
+## NumberField: `number`
 
 - Parses input to _numbers_. Coerces numeric strings. Other types invalid.
 - Formats values to _numbers_.
@@ -224,7 +224,7 @@ interface NumberOptions extends BaseFieldOptions {
 
 
 
-## DateTimeField: Date
+## DateTimeField: `Date`
 
 - Parses input to _`Date` instances_. Coercing date-ish strings using `Date.parse()`. 
 - Formats values to _strings_ with `Date.toISOString()`.
@@ -242,7 +242,7 @@ interface DateTimeFieldOptions extends BaseFieldOptions {
 | minDate   | Validate that the date provided is no earlier than this date.    | n/a |
 
 
-## ArrayField: Array<T>
+## ArrayField: `Array<T>`
 
 - Parses and formats a list of fields or nested objects.
 
@@ -329,16 +329,16 @@ try {
 
 For custom validation and rules that must examine the whole object, methods can be added to the `DTObject` class.
 
-To run the logic after parsing, use the `@AfterParse` decorator.
+To run the logic after coercion, use the `@AfterCoerce` decorator.
 
 ```typescript
-import { AfterParse, BeforeParse, ValidationError } from "dto-classes";
+import { AfterCoerce, BeforeParse, ValidationError } from "dto-classes";
 
 class MovieDto extends DTObject {
     title = StringField.bind()
     director = DirectorDto.bind()
 
-    @AfterParse()
+    @AfterCoerce()
     rejectBadTitles() {
         if (this.title == 'Yet Another Superhero Movie') {
             throw new ValidationError('No thanks');
@@ -350,13 +350,13 @@ class MovieDto extends DTObject {
 The method can modify the object as well:
 
 ```typescript
-import { AfterParse, BeforeParse, ValidationError } from "dto-classes";
+import { AfterCoerce, BeforeParse, ValidationError } from "dto-classes";
 
 class MovieDto extends DTObject {
     title = StringField.bind()
     director = DirectorDto.bind()
 
-    @AfterParse()
+    @AfterCoerce()
     makeTitleExciting() {
         this.title = this.title + '!!';
     }
@@ -368,7 +368,7 @@ class MovieDto extends DTObject {
 Override the static `format` method to apply custom formatting.
 
 ```typescript
-import { AfterParse, BeforeParse, ValidationError } from "dto-classes";
+import { AfterCoerce, BeforeParse, ValidationError } from "dto-classes";
 
 class MovieDto extends DTObject {
     title = StringField.bind()
