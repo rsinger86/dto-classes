@@ -7,23 +7,9 @@ import { ParseReturnType } from "../types";
 export class BooleanField<T extends BaseFieldOptions = BaseFieldOptions> extends BaseField {
     _options: T;
 
-    readonly TRUE_VALUES = [
-        't', 'T',
-        'y', 'Y', 'yes', 'Yes', 'YES',
-        'true', 'True', 'TRUE',
-        'on', 'On', 'ON',
-        '1', 1,
-        true
-    ];
+    readonly TRUE_VALUES = ['t', 'T', 'y', 'Y', 'yes', 'Yes', 'YES', 'true', 'True', 'TRUE', 'on', 'On', 'ON', '1', 1, true];
 
-    readonly FALSE_VALUES = [
-        'f', 'F',
-        'n', 'N', 'no', 'No', 'NO',
-        'false', 'False', 'FALSE',
-        'off', 'Off', 'OFF',
-        '0', 0, 0.0,
-        false
-    ];
+    readonly FALSE_VALUES = ['f', 'F', 'n', 'N', 'no', 'No', 'NO', 'false', 'False', 'FALSE', 'off', 'Off', 'OFF', '0', 0, 0.0, false];
 
     readonly NULL_VALUES = ['null', 'Null', 'NULL', '', null];
 

@@ -59,6 +59,7 @@ You'll get more accurate type hints with strict null checks in your `tsconfig.js
     // ...
 }
 ```
+
 # Basic Usage
 
 ## Parsing & Validating
@@ -132,35 +133,112 @@ Special types, like JavaScript's Date object, will be converted to JSON compatib
 }
 ```
 
-Importantly, any internal properties not specified will be ommitted from the formatted output.
+Any internal properties not specified will be ommitted from the formatted output.
 
 # Fields
 
-Field handle converting between primitive values and internal datatypes. They also deal with validating input values. They are attached to a `DTObject` using the `bind(options)` static method. 
+Fields handle converting between primitive values and internal datatypes. They also deal with validating input values. They are attached to a `DTObject` using the `bind(options)` static method. 
 
 All field types accept some core options:
 
 ```typescript
 interface BaseFieldOptions {
-    required?: boolean;  // Whether an input value is required; default is false
-    allowNull?: boolean; // Whether null input values are allowed; default is false
-    readOnly?: boolean;  // If true, the field is included in the format() output, but ignored when parsing; default is false
-    writeOnly?: boolean; // If true, the field is parsed/validated, but excluded in the format() output
+    required?: boolean;  
+    allowNull?: boolean;
+    readOnly?: boolean;  
+    writeOnly?: boolean; 
     default?: any;
     partial?: boolean;
-    formatSource?: string | null; // The property name on the internal object to pull when formatting; only use if different from the DTO field name
+    formatSource?: string;
 }
 ```
 
+| Option      | Description                         | Default |
+| ----------- | ---------------------------------- |  ------- |
+| required    | Whether an input value is required | true |
+| allowNull   | Whether null input values are allowed | false |
+| readOnly    | If true, any input value is ignored during parsing, but is included in the output format | false |
+| writeOnly   | If true, the field's value is excluded from the formatted output, but is included in parsing | false |
+| default     | The default value to use during parsing if none is present in the input | n/a |
+| formatSource  | The name of the attribute that will be used to populate the field, if different from the formatted field name name | n/a  |
+
+## StringField
+
+Parses input to strings, coercing numbers. Formats all value types to strings.
+
+```typescript
+interface StringOptions extends BaseFieldOptions {
+    allowBlank?: boolean;
+    trimWhitespace?: boolean;
+    maxLength?: number | null;
+    minLength?: number | null;
+    pattern?: RegExp,
+    format?: 'email' | 'url'
+}
+```
+| Option      | Description                         | Default |
+| ----------- | ---------------------------------- |  ------- |
+| allowBlank    | If set to true then the empty string should be considered a valid value. If set to false then the empty string is considered invalid and will raise a validation error. | false |
+| trimWhitespace   | If set to true then leading and trailing whitespace is trimmed.  | true |
+| maxLength    | Validates that the input contains no more than this number of characters. | n/a |
+| minLength   | Validates that the input contains no fewer than this number of characters. | n/a |
+| pattern     | A `Regex` that the input must match or a ValidationError will be thrown. | n/a |
+| format  | A predefined format that the input must conform to or a ValidationError will be thrown. Supported values: `email`, `url`. | n/a  |
+
+## BooleanField
+
+Parses input to booleans, coercing certain booleanish strings. Formats values to booleans.
+
+Truthy inputs:
+```typescript
+['t', 'T', 'y', 'Y', 'yes', 'Yes', 'YES', 'true', 'True', 'TRUE', 'on', 'On', 'ON', '1', 1, true]
+```
+
+Falsey inputs:
+```typescript
+['f', 'F', 'n', 'N', 'no', 'No', 'NO', 'false', 'False', 'FALSE', 'off', 'Off', 'OFF', '0', 0, 0.0, false]
+```
+
+## NumberField
+
+Parses input to numbers, coercing numeric strings. Formats values to numbers.
+
+```typescript
+interface NumberOptions extends BaseFieldOptions {
+    maxValue?: number;
+    minValue?: number;
+}
+```
+
+| Option      | Description                         | Default |
+| ----------- | ---------------------------------- |  ------- |
+| maxValue   | Validate that the number provided is no greater than this value. | n/a |
+| minValue   | Validate that the number provided is no less than this value. | n/a |
+
+
+
+## DateTimeField
+
+Parses input to `Date` instances, coercing date-ish strings. Formats internal values to strings.
+
+```typescript
+interface DateTimeFieldOptions extends BaseFieldOptions {
+    maxDate?: Date | null;
+    minDate?: Date | null;
+}
+```
+
+| Option      | Description                                                  | Default |
+| ----------- | ---------------------------------------------------------------- | --- |
+| maxDate   | Validate that the date provided is no later than this date. | n/a |
+| minDate   | Validate that the date provided is no earlier than this date.    | n/a |
+
+
 # Error Handling
 
-# Customization
+# Custom Parsing/Validation
 
-## Validation
-
-## Formatting
-
-## Fields
+# Custom Formatting
 
 # Less Common Scenarios
 

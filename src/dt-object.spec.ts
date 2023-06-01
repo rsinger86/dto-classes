@@ -15,7 +15,7 @@ describe('test parse', () => {
             lastName = StringField.bind()
         }
 
-        const person = await new Person({}).parseValue({ firstName: 'Robert', lastName: 'Singer' });
+        const person = await Person.parse({ firstName: 'Robert', lastName: 'Singer' });
         expect(person.firstName).toEqual('Robert');
         expect(person.lastName).toEqual('Singer');
     });
@@ -27,7 +27,7 @@ describe('test parse', () => {
         }
 
         await expect(
-            async () => await new Person({}).parseValue({ firstName: 'Robert' })
+            async () => await Person.parse({ firstName: 'Robert' })
         ).rejects.toThrowError('This field is required.')
     });
 
@@ -37,7 +37,7 @@ describe('test parse', () => {
             lastName = StringField.bind({ "default": "James" })
         }
 
-        const person = await new Person().parseValue({ firstName: 'Robert' });
+        const person = await Person.parse({ firstName: 'Robert' });
         expect(person.firstName).toEqual('Robert');
         expect(person.lastName).toEqual('James');
     });
@@ -54,7 +54,7 @@ describe('test parse', () => {
             job = Job.bind()
         }
 
-        const person = await new Person().parseValue({ firstName: 'Robert', job: { title: 'Programmer', isSatisfying: true } });
+        const person = await Person.parse({ firstName: 'Robert', job: { title: 'Programmer', isSatisfying: true } });
         expect(person.firstName).toEqual('Robert');
         expect(person.lastName).toEqual('James');
         expect(person.job.title).toEqual('Programmer');
@@ -109,6 +109,7 @@ describe('test getValues', () => {
             title = StringField.bind()
             isSatisfying = BooleanField.bind()
         }
+
 
         class Person extends DTObject {
             firstName = StringField.bind()
@@ -234,7 +235,7 @@ describe('test format', () => {
             birthday = DateTimeField.bind({ formatSource: 'dateOfBirth' })
         }
 
-        const data = await new Person({}).formatValue({
+        const data = await Person.format({
             firstName: 'Robert',
             lastName: 'Singer',
             dateOfBirth: new Date('1987-11-11')
@@ -255,7 +256,7 @@ describe('test format', () => {
             family = ArrayField.bind({ items: Recursive(Person), required: false })
         }
 
-        const data = await new Person({}).formatValue({
+        const data = await Person.format({
             firstName: 'Steve',
             lastName: 'Coolman',
             dateOfBirth: new Date('1960-01-01'),
@@ -393,7 +394,7 @@ describe('test format', () => {
             }
         }
 
-        const data = await new Person({}).formatValue({
+        const data = await Person.format({
             firstName: 'Steve',
             lastName: 'Coolman',
         });

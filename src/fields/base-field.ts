@@ -189,7 +189,7 @@ export class BaseField {
     ): Promise<C extends { items: any } ? ParseReturnType<Array<C['items']>, C> :
         ParseReturnType<ReturnType<InstanceType<T>['parseValue']>, C>> {
         const instance = new this(args ?? {} as any) as any;
-        return await instance.toInternal(data);
+        return await instance.parseValue(data);
     }
 
     static async format<
@@ -201,7 +201,7 @@ export class BaseField {
         args?: C
     ): Promise<{ [key: string]: any }> {
         const instance = new this(args ?? {} as any) as any;
-        return await instance.toRepresentation(internalObj);
+        return await instance.formatValue(internalObj);
     }
 
 }

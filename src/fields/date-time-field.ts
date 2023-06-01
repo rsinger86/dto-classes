@@ -6,7 +6,7 @@ import { ValidationError } from "../exceptions/validation-error";
 export interface DateTimeFieldOptions extends BaseFieldOptions {
     maxDate?: Date | null;
     minDate?: Date | null;
-    format?: 'iso' | '*';
+    format?: '*';
 }
 
 export class DateTimeField<T extends DateTimeFieldOptions> extends BaseField {

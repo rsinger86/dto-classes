@@ -10,18 +10,14 @@ export type ParseReturnType<T, O extends BaseFieldOptions> =
 
 export type ParseArrayReturnType<T extends ArrayOptions> = ParseReturnType<Array<T['items']>, T>;
 
+type InternalMethods = '_getParent' |
+    '_asChild' |
+    '_getDefaultValue' |
+    '_getFieldName' |
+    '_options' |
+    'getValueToFormat' |
+    'getValueToParse' |
+    'format' |
+    'parse';
 
-export type ParseDtoReturnType<T> = Promise<
-    Omit<
-        T,
-        '_getParent' |
-        '_asChild' |
-        '_getDefaultValue' |
-        '_getFieldName' |
-        '_options' |
-        'getValueToFormat' |
-        'getValueToParse' |
-        'format' |
-        'parse'
-    >
->;
+export type ParseDtoReturnType<T> = Promise<Omit<T, InternalMethods>>;
