@@ -76,7 +76,7 @@ class DirectorDto extends DTObject {
 class MovieDto extends DTObject {
     title = StringField.bind()
     releaseDate = DateTimeField.bind()
-    director = ArtistDto.bind(),
+    director = DirectorDto.bind(),
     genre = StringField.bind({required: false})
 }
 ```
@@ -299,7 +299,7 @@ class DirectorDto extends DTObject {
 
 class MovieDto extends DTObject {
     title = StringField.bind()
-    director = ArtistDto.bind(),
+    director = DirectorDto.bind(),
 }
 
 try {
@@ -332,7 +332,7 @@ import { AfterParse, BeforeParse, ValidationError } from "dto-classes";
 
 class MovieDto extends DTObject {
     title = StringField.bind()
-    director = ArtistDto.bind()
+    director = DirectorDto.bind()
 
     @AfterParse()
     rejectBadTitles() {
@@ -350,7 +350,7 @@ import { AfterParse, BeforeParse, ValidationError } from "dto-classes";
 
 class MovieDto extends DTObject {
     title = StringField.bind()
-    director = ArtistDto.bind()
+    director = DirectorDto.bind()
 
     @AfterParse()
     makeTitleExciting() {
@@ -360,6 +360,23 @@ class MovieDto extends DTObject {
 ```
 
 # Custom Formatting
+
+Override the static `format` method to apply custom formatting.
+
+```typescript
+import { AfterParse, BeforeParse, ValidationError } from "dto-classes";
+
+class MovieDto extends DTObject {
+    title = StringField.bind()
+    director = DirectorDto.bind()
+
+    static format(value: any) {
+        const formatted = super.format(value);
+        formatted['genre'] = formatted['director']['name'].includes("Mike Judge") ? 'drama' : 'drama';
+        return formatted;
+    }
+}
+```
 
 # Less Common Scenarios
 
