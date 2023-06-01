@@ -62,6 +62,10 @@ You'll get more accurate type hints with strict null checks in your `tsconfig.js
 
 # Basic Usage
 
+The library handles both _parsing_, the process of transforming inputs to the most relevant types, and _validating_, the process of ensuring values meet the correct criteria.
+
+This aligns with the [robustness principle](https://en.wikipedia.org/wiki/Robustness_principle). When consuming an input for an age field, most applications will want the string `"25"` converted to the number `25`. However, you can override this default behavior with your own custom `NumberField`.
+
 ## Parsing & Validating
 
 Let's start by defining some schema classes. Extend the `DTObject` class and define its fields:
