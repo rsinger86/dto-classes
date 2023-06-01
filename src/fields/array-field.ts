@@ -4,10 +4,11 @@ import { ParseArrayReturnType } from "../types";
 import { ValidationError } from "../exceptions/validation-error";
 import { AfterParse } from "../decorators";
 import { DeferredField } from "../recursive";
+import { DTObject } from "src/dt-object";
 
 
 export interface ArrayOptions extends BaseFieldOptions {
-    items?: any;
+    items: BaseField | DTObject;
     maxLength?: number | null;
     minLength?: number | null;
 }

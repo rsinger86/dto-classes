@@ -164,14 +164,15 @@ interface BaseFieldOptions {
 
 ## StringField
 
-Parses input to strings, coercing numbers. Formats all value types to strings.
+- Parses input to strings. Coerces numbers, other types invalid. 
+- Formats all value types to strings.
 
 ```typescript
 interface StringOptions extends BaseFieldOptions {
     allowBlank?: boolean;
     trimWhitespace?: boolean;
-    maxLength?: number | null;
-    minLength?: number | null;
+    maxLength?: number;
+    minLength?: number;
     pattern?: RegExp,
     format?: 'email' | 'url'
 }
@@ -187,7 +188,8 @@ interface StringOptions extends BaseFieldOptions {
 
 ## BooleanField
 
-Parses input to booleans, coercing certain booleanish strings. Formats values to booleans.
+- Parses input to booleans. Coerces certain bool-y strings. Other types invalid.
+- Formats values to booleans.
 
 Truthy inputs:
 ```typescript
@@ -201,7 +203,8 @@ Falsey inputs:
 
 ## NumberField
 
-Parses input to numbers, coercing numeric strings. Formats values to numbers.
+- Parses input to numbers. Coerces numeric strings. Other types invalid.
+- Formats values to numbers.
 
 ```typescript
 interface NumberOptions extends BaseFieldOptions {
@@ -219,12 +222,13 @@ interface NumberOptions extends BaseFieldOptions {
 
 ## DateTimeField
 
-Parses input to `Date` instances, coercing date-ish strings. Formats internal values to strings.
+- Parses input to `Date` instances. Coercing date-ish strings using `Date.parse()`. 
+- Formats values to strings with `Date.toISOString()`.
 
 ```typescript
 interface DateTimeFieldOptions extends BaseFieldOptions {
-    maxDate?: Date | null;
-    minDate?: Date | null;
+    maxDate?: Date;
+    minDate?: Date;
 }
 ```
 
@@ -234,9 +238,126 @@ interface DateTimeFieldOptions extends BaseFieldOptions {
 | minDate   | Validate that the date provided is no earlier than this date.    | n/a |
 
 
+## ArrayField
+
+- Parses and formats a list of fields or nested objects.
+
+```typescript
+interface ArrayOptions extends BaseFieldOptions {
+    items: BaseField | DTObject;
+    maxLength?: number;
+    minLength?: number;
+}
+```
+
+| Option      | Description                                                  | Default |
+| ----------- | ---------------------------------------------------------------- | --- |
+| items   | A bound field or object | n/a |
+| maxLength   | Validates that the array contains no fewer than this number of elements. | n/a |
+| minLength   | Validates that the list contains no more than this number of elements.    | n/a |
+
+
+Examples:
+
+```typescript
+class ActionDto extends DTObject {
+    name = String.bind()
+    timestamp = DateTimeField.bind()
+}
+
+class UserDto extends DTObject {
+    actions = ArrayField.bind({ items: ActionDto.bind() })
+    emailAddresses = ArrayField.bind({ items: StringField.bind() })
+}
+```
+
 # Error Handling
 
+If parsing fails for any reason -- the input data could not be parsed or a validation constraint failed -- a `ValidationError` is thrown.
+
+The error can be inspected:
+
+```
+class ValidationError extends Error {
+  issues: ValidationIssue[];
+}
+
+interface ValidationIssue {
+    path: string[]; // path to the field that raised the error
+    message: string; // English description of the problem
+}
+```
+
+Example:
+```typescript
+import { ValidationError } from "dto-classes";
+
+
+class DirectorDto extends DTObject {
+    name = StringField.bind()
+}
+
+class MovieDto extends DTObject {
+    title = StringField.bind()
+    director = ArtistDto.bind(),
+}
+
+try {
+    const movieDto = await MovieDto.parse({
+        title: 'Clifford', 
+        director: {}
+    });
+} catch (error) {
+    if (error instanceof ValidationError) {
+        console.log(error.issues);
+        /* [
+            {
+                "path": ["director.name"],
+                "message": "This field is required"
+            }
+        ] */
+    }
+}
+
+```
+
 # Custom Parsing/Validation
+
+For custom validation and rules that must examine the whole object, methods can be added to the `DTObject` class.
+
+To run the logic after parsing, use the `@AfterParse` decorator.
+
+```typescript
+import { AfterParse, BeforeParse, ValidationError } from "dto-classes";
+
+class MovieDto extends DTObject {
+    title = StringField.bind()
+    director = ArtistDto.bind()
+
+    @AfterParse()
+    rejectBadTitles() {
+        if (this.title == 'Yet Another Superhero Movie') {
+            throw new ValidationError('No thanks');
+        }
+    }
+}
+```
+
+The method can modify the object as well:
+
+```typescript
+import { AfterParse, BeforeParse, ValidationError } from "dto-classes";
+
+class MovieDto extends DTObject {
+    title = StringField.bind()
+    director = ArtistDto.bind()
+
+    @AfterParse()
+    makeTitleExciting() {
+        this.title = this.title + '!!';
+    }
+}
+```
 
 # Custom Formatting
 
@@ -247,3 +368,5 @@ interface DateTimeFieldOptions extends BaseFieldOptions {
 ## Standalone Fields
 
 # NestJS
+
+Coming soon...
