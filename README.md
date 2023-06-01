@@ -277,7 +277,7 @@ If parsing fails for any reason -- the input data could not be parsed or a valid
 
 The error can be inspected:
 
-```
+```typescript
 class ValidationError extends Error {
   issues: ValidationIssue[];
 }
@@ -312,7 +312,7 @@ try {
         console.log(error.issues);
         /* [
             {
-                "path": ["director.name"],
+                "path": ["director", "name"],
                 "message": "This field is required"
             }
         ] */
@@ -372,7 +372,7 @@ class MovieDto extends DTObject {
 
     static format(value: any) {
         const formatted = super.format(value);
-        formatted['genre'] = formatted['director']['name'].includes("Mike Judge") ? 'drama' : 'drama';
+        formatted['genre'] = formatted['director']['name'].includes("Mike Judge") ? 'comedy' : 'drama';
         return formatted;
     }
 }
