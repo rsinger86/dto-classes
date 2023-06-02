@@ -1,14 +1,16 @@
 # Introduction
 
-DTO Classes is a TypeScript library for parsing, validating and serializing, designed primarily for data transfer objects in HTTP JSON APIs.
+DTO Classes is a TypeScript library designed primarily to model data transfer objects in HTTP JSON APIs.
 
 It gives you the following, a bundle I've found missing in the TypeScript/Node ecosystem:
-- Class-based schemas that parse/validate and serialize internal objects to JSON
+- Class-based schemas that serialize *and* deserialize:
+  - Parse/validate JSON to internal objects
+  - Format internal objects to JSON
 - Fields attached to schemas as class properties
-- Static types available by default without an additional `infer` call
-- Custom validation by adding class methods to a schema class
-- Constraints defined in a single options interface, not by chaining methods
-- Async by default to play nice with ORMs within schemas
+- Static types by default without an additional `infer` call
+- Custom validation by adding methods to a schema class
+- Async parsing & formatting to play nice with ORMs
+- An API broadly similar to OpenAPI and JSON Schema
 
 Example:
 
@@ -394,7 +396,7 @@ import { ArrayField, Rescursive } from "dto-classes";
 class MovieDto extends DTObject {
     title = StringField.bind()
     director = DirectorDto.bind()
-    sequals: ArrayField({items: Recursive(MovieDto)})
+    sequels: ArrayField({items: Recursive(MovieDto)})
 }
 ```
 
