@@ -8,7 +8,7 @@ import { DTObject } from "src/dt-object";
 
 
 export interface ArrayOptions extends BaseFieldOptions {
-    items: BaseField | DTObject;
+    items: any; // BaseField | DTObject;
     maxLength?: number | null;
     minLength?: number | null;
 }

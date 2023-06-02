@@ -102,9 +102,7 @@ We can parse and validate the data by calling the static method `parse(data)` wh
 const movieDto = await MovieDto.parse(data);
 ```
 
-If it succeeds, it will return a strongly typed instance of the class.
-
-If it fails, it will raise a validation error:
+If it succeeds, it will return a strongly typed instance of the class. If it fails, it will raise a validation error:
 
 ```typescript
 import { ParseError } from "dto-classes";
