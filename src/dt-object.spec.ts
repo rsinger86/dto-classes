@@ -1,6 +1,6 @@
 import { AfterParse, Format } from "./decorators";
 import { DTObject } from "./dt-object";
-import { ValidationError } from "./exceptions/validation-error";
+import { ParseError } from "./exceptions/parse-error";
 import { ArrayField } from "./fields/array-field";
 import { BooleanField } from "./fields/boolean-field";
 import { DateTimeField } from "./fields/date-time-field";
@@ -143,7 +143,7 @@ describe('test decorated method calls', () => {
             @AfterParse()
             customValidate(value: this) {
                 if (value.firstName === 'Robert') {
-                    throw new ValidationError("Can't use that name")
+                    throw new ParseError("Can't use that name")
                 }
             }
         }
@@ -163,7 +163,7 @@ describe('test decorated method calls', () => {
             @AfterParse()
             customValidate(value: this) {
                 if (value.isSatisfying) {
-                    throw new ValidationError("Can't have a satisfying job")
+                    throw new ParseError("Can't have a satisfying job")
                 }
             }
         }
@@ -181,7 +181,7 @@ describe('test decorated method calls', () => {
         try {
             await new Person().parseValue({ firstName: 'Robert', job: { title: 'Programmer', isSatisfying: true } });
         } catch (e: any) {
-            if (e instanceof ValidationError) {
+            if (e instanceof ParseError) {
                 expect(e.issues[0].path).toEqual(['job']);
                 expect(e.issues[0].message).toEqual("Can't have a satisfying job")
                 correctExceptionFound = true;

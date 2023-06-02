@@ -1,4 +1,4 @@
-export class ValidationIssue {
+export class ParseIssue {
     public readonly message: string;
     public path: string[] = [];
 

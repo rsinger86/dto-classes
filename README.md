@@ -105,12 +105,12 @@ If it succeeds, it will return a strongly typed instance of the class.
 If it fails, it will raise a validation error:
 
 ```typescript
-import { ValidationError } from "dto-classes";
+import { ParseError } from "dto-classes";
 
 try {
     const movieDto = await MovieDto.parse(data);
 } catch (error) {
-    if (error instanceof ValidationError) {
+    if (error instanceof ParseError) {
         // 
     }
 }
@@ -187,8 +187,8 @@ interface StringOptions extends BaseFieldOptions {
 | trimWhitespace   | If set to true then leading and trailing whitespace is trimmed.  | true |
 | maxLength    | Validates that the input contains no more than this number of characters. | n/a |
 | minLength   | Validates that the input contains no fewer than this number of characters. | n/a |
-| pattern     | A `Regex` that the input must match or a ValidationError will be thrown. | n/a |
-| format  | A predefined format that the input must conform to or a ValidationError will be thrown. Supported values: `email`, `url`. | n/a  |
+| pattern     | A `Regex` that the input must match or a ParseError will be thrown. | n/a |
+| format  | A predefined format that the input must conform to or a ParseError will be thrown. Supported values: `email`, `url`. | n/a  |
 
 ## BooleanField: `boolean`
 
@@ -277,12 +277,12 @@ class UserDto extends DTObject {
 
 # Error Handling
 
-If parsing fails for any reason -- the input data could not be parsed or a validation constraint failed -- a `ValidationError` is thrown.
+If parsing fails for any reason -- the input data could not be parsed or a validation constraint failed -- a `ParseError` is thrown.
 
 The error can be inspected:
 
 ```typescript
-class ValidationError extends Error {
+class ParseError extends Error {
   issues: ValidationIssue[];
 }
 
@@ -294,7 +294,7 @@ interface ValidationIssue {
 
 Example:
 ```typescript
-import { ValidationError } from "dto-classes";
+import { ParseError } from "dto-classes";
 
 
 class DirectorDto extends DTObject {
@@ -312,7 +312,7 @@ try {
         director: {}
     });
 } catch (error) {
-    if (error instanceof ValidationError) {
+    if (error instanceof ParseError) {
         console.log(error.issues);
         /* [
             {
@@ -329,19 +329,19 @@ try {
 
 For custom validation and rules that must examine the whole object, methods can be added to the `DTObject` class.
 
-To run the logic after coercion, use the `@AfterCoerce` decorator.
+To run the logic after coercion, use the `@AfterParse` decorator.
 
 ```typescript
-import { AfterCoerce, BeforeParse, ValidationError } from "dto-classes";
+import { AfterParse, BeforeParse, ParseError } from "dto-classes";
 
 class MovieDto extends DTObject {
     title = StringField.bind()
     director = DirectorDto.bind()
 
-    @AfterCoerce()
+    @AfterParse()
     rejectBadTitles() {
         if (this.title == 'Yet Another Superhero Movie') {
-            throw new ValidationError('No thanks');
+            throw new ParseError('No thanks');
         }
     }
 }
@@ -350,13 +350,13 @@ class MovieDto extends DTObject {
 The method can modify the object as well:
 
 ```typescript
-import { AfterCoerce, BeforeParse, ValidationError } from "dto-classes";
+import { AfterParse, BeforeParse, ParseError } from "dto-classes";
 
 class MovieDto extends DTObject {
     title = StringField.bind()
     director = DirectorDto.bind()
 
-    @AfterCoerce()
+    @AfterParse()
     makeTitleExciting() {
         this.title = this.title + '!!';
     }
@@ -368,7 +368,7 @@ class MovieDto extends DTObject {
 Override the static `format` method to apply custom formatting.
 
 ```typescript
-import { AfterCoerce, BeforeParse, ValidationError } from "dto-classes";
+import { AfterParse, BeforeParse, ParseError } from "dto-classes";
 
 class MovieDto extends DTObject {
     title = StringField.bind()
@@ -386,7 +386,36 @@ class MovieDto extends DTObject {
 
 ## Recursive Objects
 
+To prevent recursion errors (eg "Maximum call stack size exceeded"), wrap nested self-refrencing objects in a `Recursive` call:
+
+```typescript
+import { ArrayField, Rescursive } from "dto-classes";
+
+class MovieDto extends DTObject {
+    title = StringField.bind()
+    director = DirectorDto.bind()
+    sequals: ArrayField({items: Recursive(MovieDto)})
+}
+```
+
 ## Standalone Fields
+
+It's possible to use fields outside of `DTObject` schemas:
+
+```typescript
+import { DateTimeField } from "dto-classes";
+
+const pastOrPresentday = DateTimeField.parse('2022-12-25', {maxDate: new Date()});
+```
+
+You can also create re-usable object schemas by calling the instance method `parseValue()`:
+
+```typescript
+const pastOrPresentSchema = new DateTimeField({maxDate: new Date()});
+
+pastOrPresentSchema.parseValue('2021-04-16');
+pastOrPresentSchema.parseValue('2015-10-23');
+```
 
 # NestJS
 

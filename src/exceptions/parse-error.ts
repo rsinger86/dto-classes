@@ -1,14 +1,14 @@
-import { ValidationIssue } from "./validation-issue";
+import { ParseIssue } from "./parse-issue";
 
-export class ValidationError extends Error {
-    issues: ValidationIssue[] = [];
+export class ParseError extends Error {
+    issues: ParseIssue[] = [];
 
-    constructor(issues: ValidationIssue[] | string) {
+    constructor(issues: ParseIssue[] | string) {
         if (typeof issues === 'string') {
-            issues = [new ValidationIssue(issues)]
+            issues = [new ParseIssue(issues)]
         }
         super(issues.map(x => x.message).join(' '));
-        this.name = "ValidationError";
+        this.name = "ParseError";
         this.issues = issues;
     }
 
@@ -18,8 +18,8 @@ export class ValidationError extends Error {
         }
     }
 
-    public static combine(errors: ValidationError[]) {
-        let allIssues: ValidationIssue[] = [];
+    public static combine(errors: ParseError[]) {
+        let allIssues: ParseIssue[] = [];
 
         for (const error of errors) {
             for (const issue of error.issues) {
@@ -27,7 +27,7 @@ export class ValidationError extends Error {
             }
         }
 
-        return new ValidationError(allIssues);
+        return new ParseError(allIssues);
     }
 }
 

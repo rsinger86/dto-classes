@@ -1,6 +1,6 @@
 import { getAllPropertyNames } from "../utils";
-import { ValidationError } from "../exceptions/validation-error";
-import { ValidationIssue } from "../exceptions/validation-issue";
+import { ParseError } from "../exceptions/parse-error";
+import { ParseIssue } from "../exceptions/parse-issue";
 import { BeforeParse, IS_POST_PARSER_KEY, IS_PREPARSER_KEY, POST_PARSER_OPTIONS_KEY, ValidateMethodOptions } from "../decorators";
 import { ParseReturnType } from "../types";
 
@@ -89,7 +89,7 @@ export class BaseField {
     @BeforeParse()
     protected validateNull(value: any) {
         if (value === null && !this._options.allowNull) {
-            throw new ValidationError([new ValidationIssue('This field may not be null.')]);
+            throw new ParseError([new ParseIssue('This field may not be null.')]);
         }
 
         return value;
@@ -101,7 +101,7 @@ export class BaseField {
         const hasDefault = this._options.default !== undefined
 
         if (value === undefined && isRequired && !hasDefault) {
-            throw new ValidationError([new ValidationIssue('This field is required.')]);
+            throw new ParseError([new ParseIssue('This field is required.')]);
         }
 
         return value;

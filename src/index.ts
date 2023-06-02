@@ -7,6 +7,6 @@ export { DateTimeField, DateTimeFieldOptions } from "./fields/date-time-field";
 export { StringField, StringOptions } from "./fields/string-field";
 export { NumberField, NumberOptions } from "./fields/number-field";
 export { Recursive } from "./recursive";
-export { ValidationError } from "./exceptions/validation-error";
-export { ValidationIssue } from "./exceptions/validation-issue";
+export { ParseError as ParseError } from "./exceptions/parse-error";
+export { ParseIssue as ValidationIssue } from "./exceptions/parse-issue";
 export { ParseArrayReturnType, ParseReturnType } from "./types";

@@ -1,4 +1,4 @@
-import { ValidationError } from "../exceptions/validation-error";
+import { ParseError } from "../exceptions/parse-error";
 import { BaseField, BaseFieldOptions } from "./base-field";
 import { ParseReturnType } from "../types";
 import { AfterParse } from "../decorators";
@@ -25,7 +25,7 @@ export class StringField<T extends StringOptions = StringOptions> extends BaseFi
         const validTypes = ['number', 'string'];
 
         if (!validTypes.includes(typeof value)) {
-            throw new ValidationError('Not a valid string.');
+            throw new ParseError('Not a valid string.');
         }
 
         value = String(value) as string;
@@ -41,7 +41,7 @@ export class StringField<T extends StringOptions = StringOptions> extends BaseFi
     @AfterParse()
     public validateBlankness(value: string) {
         if (!this._options.allowBlank && value.length === 0) {
-            throw new ValidationError('This field may not be blank.');
+            throw new ParseError('This field may not be blank.');
         }
 
         return value;
@@ -52,7 +52,7 @@ export class StringField<T extends StringOptions = StringOptions> extends BaseFi
         const minLen = this._options.minLength ?? null;
 
         if (minLen !== null && value.length < minLen) {
-            throw new ValidationError(`Ensure this field has at least ${minLen} characters.`)
+            throw new ParseError(`Ensure this field has at least ${minLen} characters.`)
         }
 
         return value;
@@ -63,7 +63,7 @@ export class StringField<T extends StringOptions = StringOptions> extends BaseFi
         const maxLength = this._options.maxLength ?? null;
 
         if (maxLength !== null && value.length > maxLength) {
-            throw new ValidationError(`Ensure this field has no more than ${maxLength} characters.`)
+            throw new ParseError(`Ensure this field has no more than ${maxLength} characters.`)
         }
 
         return value;
@@ -74,7 +74,7 @@ export class StringField<T extends StringOptions = StringOptions> extends BaseFi
         const pattern = this._options.pattern ?? null;
 
         if (pattern && !pattern.test(value)) {
-            throw new ValidationError('This value does not match the required pattern.');
+            throw new ParseError('This value does not match the required pattern.');
         }
 
         return value;
@@ -83,7 +83,7 @@ export class StringField<T extends StringOptions = StringOptions> extends BaseFi
     @AfterParse()
     public validateEmailFormat(value: string) {
         if (this._options.format === 'email' && !REGEX_PATTERNS.EMAIL.test(value)) {
-            throw new ValidationError('Not a valid email address.')
+            throw new ParseError('Not a valid email address.')
         }
 
         return value;
@@ -92,7 +92,7 @@ export class StringField<T extends StringOptions = StringOptions> extends BaseFi
     @AfterParse()
     public validateUrlFormat(value: string) {
         if (this._options.format === 'url' && !REGEX_PATTERNS.HTTP_URL.test(value)) {
-            throw new ValidationError('This value is not a valid URL.')
+            throw new ParseError('This value is not a valid URL.')
         }
 
         return value;

@@ -1,7 +1,7 @@
 import { BaseField, BaseFieldOptions } from "./base-field";
 import { ParseReturnType } from "../types";
 import { AfterParse } from "../decorators";
-import { ValidationError } from "../exceptions/validation-error";
+import { ParseError } from "../exceptions/parse-error";
 
 export interface NumberOptions extends BaseFieldOptions {
     maxValue?: number;
@@ -23,7 +23,7 @@ export class NumberField<T extends NumberOptions> extends BaseField {
         } else if (typeof value === 'number') {
             value = value;
         } else {
-            throw new ValidationError('Invalid number passed.');
+            throw new ParseError('Invalid number passed.');
         }
 
         return value;
@@ -34,7 +34,7 @@ export class NumberField<T extends NumberOptions> extends BaseField {
         const maxValue = this._options.maxValue ?? null;
 
         if (maxValue !== null && value > maxValue) {
-            throw new ValidationError(`Ensure the value is no more than ${maxValue}.`)
+            throw new ParseError(`Ensure the value is no more than ${maxValue}.`)
         }
 
         return value;
@@ -45,7 +45,7 @@ export class NumberField<T extends NumberOptions> extends BaseField {
         const minValue = this._options.minValue ?? null;
 
         if (minValue !== null && value < minValue) {
-            throw new ValidationError(`Ensure the value is at least ${minValue}.`)
+            throw new ParseError(`Ensure the value is at least ${minValue}.`)
         }
 
         return value;

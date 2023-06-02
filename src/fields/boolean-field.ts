@@ -1,6 +1,6 @@
-import { ValidationError } from "../exceptions/validation-error";
+import { ParseError } from "../exceptions/parse-error";
 import { BaseField, BaseFieldOptions } from "./base-field";
-import { ValidationIssue } from "../exceptions/validation-issue";
+import { ParseIssue } from "../exceptions/parse-issue";
 import { ParseReturnType } from "../types";
 
 
@@ -26,7 +26,7 @@ export class BooleanField<T extends BaseFieldOptions = BaseFieldOptions> extends
             return null as any;
         }
 
-        throw new ValidationError([new ValidationIssue('Must be a valid boolean.')])
+        throw new ParseError([new ParseIssue('Must be a valid boolean.')])
     }
 
     public async formatValue(value: any): Promise<boolean> {

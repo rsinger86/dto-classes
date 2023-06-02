@@ -1,5 +1,5 @@
 import { FORMATTER_OPTIONS_KEY, IS_FORMATTER_KEY } from "./decorators";
-import { ValidationError } from "./exceptions/validation-error";
+import { ParseError } from "./exceptions/parse-error";
 import { BaseField, BaseFieldOptions } from "./fields/base-field";
 import { DeferredField } from "./recursive";
 import { ParseDtoReturnType } from "./types";
@@ -92,7 +92,7 @@ export class DTObject extends BaseField {
 
 
     public async parseValue(rawObject: object): ParseDtoReturnType<this> {
-        const errors: ValidationError[] = [];
+        const errors: ParseError[] = [];
         this._parsedValues = {};
 
         for (const field of this.getFieldsToParse()) {
@@ -104,7 +104,7 @@ export class DTObject extends BaseField {
                 this._parsedValues[fieldName] = this[fieldName];
             } catch (e) {
                 this[fieldName] = undefined;
-                if (e instanceof ValidationError) {
+                if (e instanceof ParseError) {
                     e.addParentPath(fieldName);
                     errors.push(e)
                 } else {
@@ -114,7 +114,7 @@ export class DTObject extends BaseField {
         }
 
         if (errors.length > 0) {
-            throw ValidationError.combine(errors);
+            throw ParseError.combine(errors);
         }
 
         return this;

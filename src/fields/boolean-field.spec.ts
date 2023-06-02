@@ -1,4 +1,4 @@
-import { ValidationError } from "../exceptions/validation-error";
+import { ParseError } from "../exceptions/parse-error";
 import { BooleanField } from "./boolean-field";
 
 describe('parse tests', () => {
@@ -19,7 +19,15 @@ describe('parse tests', () => {
                 await boolSchema.parseValue(v);
 
             }
-            await expect(t).rejects.toThrow(ValidationError);
+            await expect(t).rejects.toThrow(ParseError);
+        }
+
+        for (const v of ['null', 'Null', 'NULL', '', null]) {
+            const t = async () => {
+                await BooleanField.parse(v, { allowNull: false });
+
+            }
+            await expect(t).rejects.toThrow(ParseError);
         }
     });
 

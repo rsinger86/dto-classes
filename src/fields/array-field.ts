@@ -1,7 +1,7 @@
-import { ValidationIssue } from "../exceptions/validation-issue";
+import { ParseIssue } from "../exceptions/parse-issue";
 import { BaseFieldOptions, BaseField } from "./base-field";
 import { ParseArrayReturnType } from "../types";
-import { ValidationError } from "../exceptions/validation-error";
+import { ParseError } from "../exceptions/parse-error";
 import { AfterParse } from "../decorators";
 import { DeferredField } from "../recursive";
 import { DTObject } from "src/dt-object";
@@ -25,7 +25,7 @@ export class ArrayField<T extends ArrayOptions> extends BaseField {
         let itemField = this._options.items as BaseField;
 
         if (!Array.isArray(value)) {
-            throw new ValidationIssue(`Ensure value is an array.`)
+            throw new ParseIssue(`Ensure value is an array.`)
         }
 
         if (itemField instanceof DeferredField) {
@@ -64,7 +64,7 @@ export class ArrayField<T extends ArrayOptions> extends BaseField {
         const minLen = this._options.minLength ?? -Infinity;
 
         if (minLen !== null && value.length < minLen) {
-            throw new ValidationError(`Ensure this field has at least ${minLen} items.`)
+            throw new ParseError(`Ensure this field has at least ${minLen} items.`)
         }
 
         return value;
@@ -75,7 +75,7 @@ export class ArrayField<T extends ArrayOptions> extends BaseField {
         const maxLength = this._options.maxLength ?? Infinity;
 
         if (maxLength !== null && value.length > maxLength) {
-            throw new ValidationError(`Ensure this field has no more than ${maxLength} items.`)
+            throw new ParseError(`Ensure this field has no more than ${maxLength} items.`)
         }
 
         return value;

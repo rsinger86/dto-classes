@@ -1,7 +1,7 @@
 import { BaseField, BaseFieldOptions } from "./base-field";
 import { ParseReturnType } from "../types";
 import { AfterParse } from "../decorators";
-import { ValidationError } from "../exceptions/validation-error";
+import { ParseError } from "../exceptions/parse-error";
 
 export interface DateTimeFieldOptions extends BaseFieldOptions {
     maxDate?: Date | null;
@@ -23,13 +23,13 @@ export class DateTimeField<T extends DateTimeFieldOptions> extends BaseField {
 
 
         if (typeof value !== 'string') {
-            throw new ValidationError('Invalid date-time passed.');
+            throw new ParseError('Invalid date-time passed.');
         }
 
         const parsed = Date.parse(value);
 
         if (Number.isNaN(parsed)) {
-            throw new ValidationError('Invalid date-time passed.');
+            throw new ParseError('Invalid date-time passed.');
         }
 
         return new Date(parsed) as any;
@@ -40,7 +40,7 @@ export class DateTimeField<T extends DateTimeFieldOptions> extends BaseField {
         const maxDate = this._options.maxDate ?? null;
 
         if (maxDate !== null && value > maxDate) {
-            throw new ValidationError(`Ensure the value is no more than ${maxDate}.`)
+            throw new ParseError(`Ensure the value is no more than ${maxDate}.`)
         }
 
         return value;
@@ -51,7 +51,7 @@ export class DateTimeField<T extends DateTimeFieldOptions> extends BaseField {
         const minDate = this._options.minDate ?? null;
 
         if (minDate !== null && value < minDate) {
-            throw new ValidationError(`Ensure the value is at least ${minDate}.`)
+            throw new ParseError(`Ensure the value is at least ${minDate}.`)
         }
 
         return value;
