@@ -408,7 +408,7 @@ import { DateTimeField } from "dto-classes";
 const pastOrPresentday = DateTimeField.parse('2022-12-25', {maxDate: new Date()});
 ```
 
-You can also create re-usable object schemas by calling the instance method `parseValue()`:
+You can also create re-usable field schemas by calling the instance method `parseValue()`:
 
 ```typescript
 const pastOrPresentSchema = new DateTimeField({maxDate: new Date()});
