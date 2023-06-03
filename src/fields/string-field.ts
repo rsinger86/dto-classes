@@ -15,6 +15,7 @@ export interface StringOptions extends BaseFieldOptions {
 }
 
 export class StringField<T extends StringOptions = StringOptions> extends BaseField {
+    // @ts-ignore
     public _options: StringOptions;
 
     constructor(options?: T) {

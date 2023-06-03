@@ -11,7 +11,6 @@ export interface BaseFieldOptions {
     allowNull?: boolean;
     readOnly?: boolean;
     writeOnly?: boolean;
-    source?: string;
     default?: any;
     partial?: boolean;
     formatSource?: string | null;
@@ -21,15 +20,15 @@ export interface BaseFieldOptions {
 export class BaseField {
     public readonly _options: BaseFieldOptions;
 
-    private _parent: BaseField;
-    private _fieldName: string;
+    private _parent: BaseField | null = null;
+    private _fieldName: string = '';
 
     constructor(options: BaseFieldOptions = {}) {
         this._options = options ?? {};
         const originalParse = this.parseValue;
 
         this.parseValue = async (value) => {
-            value = await this.beforeParse(value);
+            value = await this._beforeParse(value);
 
             if (value === undefined && !this._options.partial) {
                 return this._getDefaultValue();
@@ -39,13 +38,13 @@ export class BaseField {
                 value = await originalParse.apply(this, [value]);
             }
 
-            value = await this.afterParse(value);
+            value = await this._afterParse(value);
             return value;
         };
     }
 
 
-    protected clone() {
+    protected _clone() {
         const ThisClass = this.constructor as any;
         return new ThisClass(this._options);
     }
@@ -59,7 +58,7 @@ export class BaseField {
         return this._fieldName;
     }
 
-    public _getParent(): BaseField {
+    public _getParent(): BaseField | null {
         return this._parent;
     }
 
@@ -77,37 +76,7 @@ export class BaseField {
         }
     }
 
-    public getValueToParse(rawData: any, fieldName: string) {
-        return rawData;
-    }
-
-    public getValueToFormat(internalObject: any): any {
-        const source = this._options.formatSource ?? this._fieldName;
-        return internalObject[source] ?? null;
-    }
-
-    @BeforeParse()
-    protected validateNull(value: any) {
-        if (value === null && !this._options.allowNull) {
-            throw new ParseError([new ParseIssue('This field may not be null.')]);
-        }
-
-        return value;
-    }
-
-    @BeforeParse()
-    protected validateUndefined(value: any) {
-        const isRequired = this._options.required ?? true;
-        const hasDefault = this._options.default !== undefined
-
-        if (value === undefined && isRequired && !hasDefault) {
-            throw new ParseError([new ParseIssue('This field is required.')]);
-        }
-
-        return value;
-    }
-
-    protected async beforeParse(value: any) {
+    protected async _beforeParse(value: any) {
         for (const propName of getAllPropertyNames(this)) {
             const property = this[propName]
 
@@ -128,7 +97,7 @@ export class BaseField {
 
     }
 
-    protected async afterParse(value: string) {
+    protected async _afterParse(value: string) {
         for (const propName of getAllPropertyNames(this)) {
             const property = this[propName]
 
@@ -156,6 +125,42 @@ export class BaseField {
 
         return value;
     }
+
+    public getValueToParse(rawData: any, fieldName: string) {
+        return rawData;
+    }
+
+    public getValueToFormat(internalObject: any): any {
+        const source = this._options.formatSource ?? this._fieldName;
+        return internalObject[source] ?? null;
+    }
+
+    @BeforeParse()
+    protected validateNull(value: any) {
+        if (value === null && !this._options.allowNull) {
+            throw new ParseError([new ParseIssue('This field may not be null.')]);
+        }
+
+        return value;
+    }
+
+    @BeforeParse()
+    protected validateUndefined(value: any) {
+        const isRequired = this._options.required ?? true;
+        const hasDefault = this._options.default !== undefined
+        const isPartialValidation = this._options.partial === true
+
+        if (isPartialValidation) {
+            return value;
+        }
+
+        if (value === undefined && isRequired && !hasDefault) {
+            throw new ParseError([new ParseIssue('This field is required.')]);
+        }
+
+        return value;
+    }
+
     public async parseValue(value: NonNullable<any>): Promise<any> {
         return value;
     }

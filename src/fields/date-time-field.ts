@@ -10,6 +10,7 @@ export interface DateTimeFieldOptions extends BaseFieldOptions {
 }
 
 export class DateTimeField<T extends DateTimeFieldOptions> extends BaseField {
+    // @ts-ignore
     _options: T;
 
     constructor(options?: T) {

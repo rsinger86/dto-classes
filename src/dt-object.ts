@@ -35,7 +35,7 @@ export class DTObject extends BaseField {
                     attribute = (attribute as any).construct()
                 }
 
-                const clonedField = attribute.clone();
+                const clonedField = attribute._clone();
                 clonedField._asChild(this, attrName);
                 fields.push(clonedField)
             }

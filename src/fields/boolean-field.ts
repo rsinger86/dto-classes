@@ -5,6 +5,7 @@ import { ParseReturnType } from "../types";
 
 
 export class BooleanField<T extends BaseFieldOptions = BaseFieldOptions> extends BaseField {
+    // @ts-ignore
     _options: T;
 
     readonly TRUE_VALUES = ['t', 'T', 'y', 'Y', 'yes', 'Yes', 'YES', 'true', 'True', 'TRUE', 'on', 'On', 'ON', '1', 1, true];

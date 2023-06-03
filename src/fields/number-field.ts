@@ -9,6 +9,7 @@ export interface NumberOptions extends BaseFieldOptions {
 }
 
 export class NumberField<T extends NumberOptions> extends BaseField {
+    // @ts-ignore
     _options: T;
 
     constructor(options?: T) {

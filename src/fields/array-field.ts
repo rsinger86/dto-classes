@@ -14,6 +14,7 @@ export interface ArrayOptions extends BaseFieldOptions {
 }
 
 export class ArrayField<T extends ArrayOptions> extends BaseField {
+    // @ts-ignore
     _options: T;
 
     constructor(options?: T) {

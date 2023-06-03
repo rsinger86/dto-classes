@@ -1,8 +1,8 @@
 # Introduction
 
-DTO Classes is a TypeScript library designed primarily to model data transfer objects in HTTP JSON APIs.
+DTO Classes is a TypeScript library for modelling data transfer objects in HTTP JSON APIs.
 
-It gives you the following, a bundle I've found missing in the TypeScript/Node ecosystem:
+It gives you the following, a bundle I've found missing for TypeScript/Node:
 - Class-based schemas that serialize *and* deserialize:
   - Parse/validate JSON to internal objects
   - Format internal objects to JSON
@@ -50,9 +50,21 @@ VS Code:
 
 TypeScript 4.5+ is required. 
 
-Run: `npm install dto-classes`
+## From npm
+```npm install dto-classes```
 
-You'll get more accurate type hints with strict null checks in your `tsconfig.json`:
+## Config
+You'll get more accurate type hints with `strict` set to `true` in your `tsconfig.json`:
+```jsonc
+{
+  "compilerOptions": {
+    // ...
+    "strict": true
+    // ...
+}
+```
+
+If that's not practical, you'll still get useful type hints by setting `strictNullChecks` to `true`:
 ```jsonc
 {
   "compilerOptions": {
@@ -66,9 +78,9 @@ You'll get more accurate type hints with strict null checks in your `tsconfig.js
 
 The library handles both _parsing_, the process of transforming inputs to the most relevant types, and _validating_, the process of ensuring values meet the correct criteria.
 
-This aligns with the [robustness principle](https://en.wikipedia.org/wiki/Robustness_principle). When consuming an input for an age field, most applications will want the string `"25"` converted to the number `25`. However, you can override this default behavior with your own custom `NumberField`.
+This aligns with the [robustness principle](https://en.wikipedia.org/wiki/Robustness_principle). When consuming an input for an age field, most applications will want the string `"25"` auto-converted to the number `25`. However, you can override this default behavior with your own custom `NumberField`.
 
-## Parsing & Validating
+## Parsing & Validating Objects
 
 Let's start by defining some schema classes. Extend the `DTObject` class and define its fields:
 
@@ -96,7 +108,7 @@ const data = {
 }
 ```
 
-We can parse and validate the data by calling the static method `parse(data)` which will return a newly created DTO instance:
+We can coerce and validate the data by calling the static method `parse(data)` which will return a newly created DTO instance:
 
 ```typescript
 const movieDto = await MovieDto.parse(data);
@@ -116,7 +128,19 @@ try {
 }
 ```
 
-## Formatting
+For incoming `PATCH` requests, the convention is to make all fields optional, even if they'd otherwise be required. 
+
+You can pass `partial: true` for validation to succeed in these scenarios:
+
+```typescript
+const data = {
+    "releaseDate": '2006-10-06'
+}
+
+const movieDto = await MovieDto.parse(data, {partial: true});
+```
+
+## Formatting Objects
 
 You can also format internal data types to JSON data that can be returned in an HTTP response.
 
@@ -275,6 +299,24 @@ class UserDto extends DTObject {
 }
 ```
 
+## Nested Objects: `DTObject`
+
+`DTObject` classes can be nested under parent `DTObject` classes and configured with the same core `BaseFieldOptions`:
+
+```typescript
+import { DTObject, StringField, DateTimeField } from 'dto-classes';
+
+
+class Plot extends DTObject {
+    content: StringField.bind()
+}
+
+class MovieDto extends DTObject {
+    title = StringField.bind()
+    plot = Plot.bind({required: false, allowNull: true})
+}
+```
+
 # Error Handling
 
 If parsing fails for any reason -- the input data could not be parsed or a validation constraint failed -- a `ParseError` is thrown.
@@ -382,9 +424,55 @@ class MovieDto extends DTObject {
 }
 ```
 
-# Less Common Scenarios
+A nicer way to expose computed values is to use the `@Format` decorator. The single argument (e.g. "obj") will always be 
+the full object initially passed to the static `format()` method:
 
-## Recursive Objects
+```typescript
+class Person extends DTObject {
+    firstName = StringField.bind()
+    lastName = StringField.bind()
+
+    @Format()
+    fullName(obj: any) {
+        return `${obj.firstName} ${obj.lastName}`;
+    }
+}
+
+const formattedData = await Person.format({
+    firstName: 'George',
+    lastName: 'Washington',
+});
+
+expect(formattedData).toEqual({ 
+    firstName: 'George', 
+    lastName: 'Washington', 
+    fullName: 'George Washington' 
+});
+```
+
+You can customize the formatted field name by passing `{fieldName: string}` to the decorator:
+
+```typescript
+class Person extends DTObject {
+    firstName = StringField.bind()
+    lastName = StringField.bind()
+
+    @Format({fieldName: 'fullName'})
+    makeFullName(obj: any) {
+        return `${obj.firstName} ${obj.lastName}`;
+    }
+}
+
+/*
+{ 
+    firstName: 'George', 
+    lastName: 'Washington', 
+    fullName: 'George Washington' 
+}
+*/
+```
+
+# Recursive Objects
 
 To prevent recursion errors (eg "Maximum call stack size exceeded"), wrap nested self-refrencing objects in a `Recursive` call:
 
@@ -398,7 +486,7 @@ class MovieDto extends DTObject {
 }
 ```
 
-## Standalone Fields
+# Standalone Fields
 
 It's possible to use fields outside of `DTObject` schemas:
 
