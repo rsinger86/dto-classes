@@ -313,7 +313,7 @@ describe('test format', () => {
                             "firstName": "Child A",
                             "lastName": "Coolman",
                             "dateOfBirth": null,
-                            "family": []
+                            "family": null
                         }
                     ]
                 },
@@ -326,7 +326,7 @@ describe('test format', () => {
                             "firstName": "Child B",
                             "lastName": "Coolman",
                             "dateOfBirth": null,
-                            "family": []
+                            "family": null
                         }
                     ]
                 }
@@ -367,11 +367,7 @@ describe('test format', () => {
                 "supervisor": {
                     "firstName": "Pat",
                     "lastName": "X",
-                    "supervisor": {
-                        "firstName": null,
-                        "lastName": null,
-                        "supervisor": null
-                    }
+                    "supervisor": null
                 }
             }
         };
@@ -415,5 +411,47 @@ describe('test format', () => {
         });
 
         expect(data).toEqual({ firstName: 'Steve', lastName: 'Coolman', completeName: 'Steve Coolman' });
+    });
+});
+
+
+describe('test access context', () => {
+    test('should access context in deeply nested fields', async () => {
+        class Person extends DTObject {
+            name = StringField.bind()
+            manager = Recursive(Person, { required: false })
+        }
+
+        const person = await new Person({ context: { request: 'request123' } }).parseValue({
+            name: 'Robert',
+            manager: {
+                name: 'Fred',
+                manager: {
+                    name: 'Sam'
+                }
+            }
+        });
+
+        expect(person._context).toEqual({ request: 'request123' });
+        expect(person.manager._context).toEqual({ request: 'request123' });
+        expect(person.manager.manager._context).toEqual({ request: 'request123' });
+    });
+});
+
+
+describe('test ignore field input', () => {
+    test('should use default value when ignoreInput = true', async () => {
+        class Person extends DTObject {
+            name = StringField.bind()
+            timestamp = DateTimeField.bind({ ignoreInput: true, default: () => new Date() })
+        }
+
+        const person = await new Person().parseValue({
+            name: 'Robert',
+            timestamp: '1965-01-01'
+        });
+
+        expect(person.timestamp).toBeInstanceOf(Date)
+        expect(person.timestamp.getFullYear()).toEqual(new Date().getFullYear())
     });
 });

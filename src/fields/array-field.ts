@@ -13,7 +13,7 @@ export interface ArrayOptions extends BaseFieldOptions {
     minLength?: number | null;
 }
 
-export class ArrayField<T extends ArrayOptions> extends BaseField {
+export class ArrayField<T extends ArrayOptions = ArrayOptions> extends BaseField {
     // @ts-ignore
     _options: T;
 

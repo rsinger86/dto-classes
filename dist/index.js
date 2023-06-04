@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ValidationIssue = exports.ValidationError = exports.Recursive = exports.NumberField = exports.StringField = exports.DateTimeField = exports.BooleanField = exports.ArrayField = exports.BaseField = exports.DTObject = exports.AfterParse = exports.BeforeParse = exports.Format = void 0;
+exports.ValidationIssue = exports.ParseError = exports.Recursive = exports.NumberField = exports.StringField = exports.DateTimeField = exports.BooleanField = exports.ArrayField = exports.BaseField = exports.DTObject = exports.AfterParse = exports.BeforeParse = exports.Format = void 0;
 var decorators_1 = require("./decorators");
 Object.defineProperty(exports, "Format", { enumerable: true, get: function () { return decorators_1.Format; } });
 Object.defineProperty(exports, "BeforeParse", { enumerable: true, get: function () { return decorators_1.BeforeParse; } });
@@ -21,8 +21,8 @@ var number_field_1 = require("./fields/number-field");
 Object.defineProperty(exports, "NumberField", { enumerable: true, get: function () { return number_field_1.NumberField; } });
 var recursive_1 = require("./recursive");
 Object.defineProperty(exports, "Recursive", { enumerable: true, get: function () { return recursive_1.Recursive; } });
-var validation_error_1 = require("./exceptions/validation-error");
-Object.defineProperty(exports, "ValidationError", { enumerable: true, get: function () { return validation_error_1.ValidationError; } });
-var validation_issue_1 = require("./exceptions/validation-issue");
-Object.defineProperty(exports, "ValidationIssue", { enumerable: true, get: function () { return validation_issue_1.ValidationIssue; } });
+var parse_error_1 = require("./exceptions/parse-error");
+Object.defineProperty(exports, "ParseError", { enumerable: true, get: function () { return parse_error_1.ParseError; } });
+var parse_issue_1 = require("./exceptions/parse-issue");
+Object.defineProperty(exports, "ValidationIssue", { enumerable: true, get: function () { return parse_issue_1.ParseIssue; } });
 //# sourceMappingURL=index.js.map

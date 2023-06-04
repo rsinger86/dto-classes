@@ -14,6 +14,8 @@ export interface BaseFieldOptions {
     default?: any;
     partial?: boolean;
     formatSource?: string | null;
+    context?: { [key: string]: any };
+    ignoreInput?: boolean;
 }
 
 
@@ -34,7 +36,7 @@ export class BaseField {
                 if (this._options.partial) {
                     return undefined;
                 } else {
-                    return this._getDefaultValue();
+                    return await this.getDefaultParseValue();
                 }
             } else if (value !== null) {
                 value = await originalParse.apply(this, [value]);
@@ -45,10 +47,13 @@ export class BaseField {
         };
     }
 
-
     protected _clone() {
         const ThisClass = this.constructor as any;
         return new ThisClass(this._options);
+    }
+
+    public get _context(): { [key: string]: any } {
+        return this._options.context ?? {};
     }
 
     public _asChild(parent: BaseField, fieldName: string, options: BaseFieldOptions = {}) {
@@ -56,7 +61,6 @@ export class BaseField {
         this._fieldName = fieldName;
         // @ts-ignore
         this._options = { ...this._options, ...options };
-        console.log(this._options, this._fieldName)
     }
 
     public _getFieldName(): string {
@@ -67,7 +71,7 @@ export class BaseField {
         return this._parent;
     }
 
-    public _getDefaultValue(): any {
+    public async getDefaultParseValue(): Promise<any> {
         const value = this._options.default;
 
         if (this._options.partial) {
@@ -131,11 +135,7 @@ export class BaseField {
         return value;
     }
 
-    public getValueToParse(rawData: any, fieldName: string) {
-        return rawData;
-    }
-
-    public getValueToFormat(internalObject: any): any {
+    public _getValueToFormat(internalObject: any): any {
         const source = this._options.formatSource ?? this._fieldName;
         return internalObject[source] ?? null;
     }

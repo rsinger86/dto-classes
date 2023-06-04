@@ -36,7 +36,10 @@ export class DTObject extends BaseField {
                 }
 
                 const clonedField = attribute._clone();
-                clonedField._asChild(this, attrName, { partial: this._options.partial ?? false });
+                clonedField._asChild(this, attrName, {
+                    partial: this._options.partial ?? false,
+                    context: this._options.context ?? null
+                });
                 fields.push(clonedField)
             }
         }
@@ -98,6 +101,12 @@ export class DTObject extends BaseField {
         for (const field of this.getFieldsToParse()) {
             const fieldName = field._getFieldName();
             const rawValue = rawObject ? rawObject[fieldName] : undefined;
+            const ignoreInput = field._options.ignoreInput ?? false;
+
+            if (ignoreInput) {
+                this[fieldName] = await field.getDefaultParseValue();
+                continue;
+            }
 
             try {
                 this[fieldName] = await field.parseValue(rawValue);
@@ -127,8 +136,13 @@ export class DTObject extends BaseField {
             const fieldName = field._getFieldName();
 
             if (isKeyableObject(internalObj)) {
-                const internalValue = await field.getValueToFormat(internalObj);
-                formatted[fieldName] = await field.formatValue(internalValue);
+                const internalValue = await field._getValueToFormat(internalObj);
+
+                if (internalValue === undefined || internalValue === null) {
+                    formatted[fieldName] = null;
+                } else {
+                    formatted[fieldName] = await field.formatValue(internalValue);
+                }
             } else {
                 formatted[fieldName] = null;
             }

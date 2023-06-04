@@ -3,11 +3,10 @@ import { BaseFieldOptions } from "./fields/base-field";
 
 type InternalMethods = '_getParent' |
     '_asChild' |
-    '_getDefaultValue' |
+    'getDefaultParseValue' |
     '_getFieldName' |
     '_options' |
-    'getValueToFormat' |
-    'getValueToParse' |
+    '_getValueToFormat' |
     'format' |
     'parse';
 

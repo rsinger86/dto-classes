@@ -9,7 +9,7 @@ export interface DateTimeFieldOptions extends BaseFieldOptions {
     format?: '*';
 }
 
-export class DateTimeField<T extends DateTimeFieldOptions> extends BaseField {
+export class DateTimeField<T extends DateTimeFieldOptions = DateTimeFieldOptions> extends BaseField {
     // @ts-ignore
     _options: T;
 

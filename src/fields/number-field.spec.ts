@@ -1,4 +1,6 @@
+import { ParseReturnType } from "src/types";
 import { NumberField } from "./number-field";
+import { BaseField, BaseFieldOptions } from "./base-field";
 
 describe('test parse', () => {
     test('parse float string', async () => {
@@ -50,4 +52,35 @@ describe('test format', () => {
         const value = await schema.formatValue('adfadf3.4444');
         expect(value).toEqual(null);
     });
+});
+
+
+describe('test custom field', () => {
+    test('test request user field', async () => {
+        class User {
+            id = 3;
+        }
+        const request = { user: new User() };
+
+        class RequestUserField<T extends BaseFieldOptions> extends BaseField {
+            _options: T;
+
+            constructor(options?: T) {
+                super(options);
+            }
+
+            public async parseValue(value: any): ParseReturnType<User, T> {
+                return this._context.request.user;
+            }
+
+            public async getDefaultParseValue() {
+                return this._context.request.user;
+            }
+        }
+
+        const value = await RequestUserField.parse(3, { context: { request: request } });
+        expect(value).toEqual(request.user)
+    });
+
+
 });

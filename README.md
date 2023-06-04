@@ -178,6 +178,8 @@ interface BaseFieldOptions {
     default?: any;
     partial?: boolean;
     formatSource?: string;
+    ignoreInput?: boolean;
+    context?: {[key: string]: any};
 }
 ```
 
@@ -189,6 +191,8 @@ interface BaseFieldOptions {
 | writeOnly   | If true, the field's value is excluded from the formatted output, but is included in parsing | false |
 | default     | The default value to use during parsing if none is present in the input | n/a |
 | formatSource  | The name of the attribute that will be used to populate the field, if different from the formatted field name name | n/a  |
+| ignoreInput  | Whether to always return the provided `default` when parsing and ignore the user-provider input. | false  |
+| context  | A container for additional data that'd be useful during parsing or formatting. A common scenario is to pass in an HTTP request object. | n/a  |
 
 ## StringField: `string`
 

@@ -8,7 +8,7 @@ export interface NumberOptions extends BaseFieldOptions {
     minValue?: number;
 }
 
-export class NumberField<T extends NumberOptions> extends BaseField {
+export class NumberField<T extends NumberOptions = NumberOptions> extends BaseField {
     // @ts-ignore
     _options: T;
 

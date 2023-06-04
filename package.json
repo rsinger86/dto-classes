@@ -1,6 +1,6 @@
 {
   "name": "dto-classes",
-  "version": "0.0.6",
+  "version": "0.0.11",
   "description": "Classes for data transfer objects.",
   "types": "dist/index.d.ts",
   "scripts": {
