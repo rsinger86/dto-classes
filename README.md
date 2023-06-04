@@ -511,4 +511,46 @@ pastOrPresentSchema.parseValue('2015-10-23');
 
 # NestJS
 
-Coming soon...
+`DTObject` classes can integrate easily with NestJS global pipes. 
+
+Two ready-to-use examples are included.
+
+## Simple
+
+Copy the pipe in (nestjs-examples/dto-validation-pipe.ts)[nestjs-examples/dto-validation-pipe.ts] to your project.
+
+```typescript
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+  app.useGlobalPipes(new DTOValidationPipe());
+  await app.listen(3000);
+}
+bootstrap();
+```
+
+## Access Request 
+
+To implement more complex validation it's often useful to be able to access the current HTTP request object. For example, knowing the current user could affect whether validation succeeds. Or maybe you want to implement a hidden field that always returns the current user.
+
+Copy the pipe in (nestjs-examples/dto-context-validation-pipe.ts)[nestjs-examples/dto-context-validation-pipe.ts] to your project.
+
+Each request will construct its own pipe with the current request object so the pipe must be configured as a provider:
+
+```typescript
+@Module({
+  imports: [
+    UsersModule
+  ],
+  controllers: [],
+  providers: [
+    {
+        provide: APP_PIPE,
+        useClass: DTOContextValidationPipe,
+    }
+  ],
+})
+export class AppModule { }
+
+```
+
+
