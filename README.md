@@ -45,6 +45,8 @@ VS Code:
 
 ![Alt Text](vs-code-demo-1.gif)
 
+# Table of Contents
+
 <!-- TOC -->
 
 - [Introduction](#introduction)
