@@ -8,6 +8,7 @@ import { StringField } from "./fields/string-field";
 import { Recursive } from "./recursive";
 
 
+
 describe('test parse', () => {
     test('simple fields should succeed', async () => {
         class Person extends DTObject {
@@ -29,6 +30,20 @@ describe('test parse', () => {
         await expect(
             async () => await Person.parse({ firstName: 'Robert' })
         ).rejects.toThrowError('This field is required.')
+    });
+
+    describe('test parse', () => {
+        test('should not fail if required field missing but partial is ture', async () => {
+            class Person extends DTObject {
+                firstName = StringField.bind()
+                lastName = StringField.bind()
+            }
+
+            const personDto = await Person.parse({ firstName: 'Robert' }, { partial: true });
+            personDto.firstName
+            //expect(personDto.firstName).toEqual('Robert');
+            //expect(personDto.lastName).toEqual(undefined);
+        });
     });
 
     test('should use default for missing field', async () => {

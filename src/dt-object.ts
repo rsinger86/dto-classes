@@ -36,7 +36,7 @@ export class DTObject extends BaseField {
                 }
 
                 const clonedField = attribute._clone();
-                clonedField._asChild(this, attrName);
+                clonedField._asChild(this, attrName, { partial: this._options.partial ?? false });
                 fields.push(clonedField)
             }
         }

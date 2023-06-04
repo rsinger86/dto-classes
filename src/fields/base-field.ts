@@ -30,11 +30,13 @@ export class BaseField {
         this.parseValue = async (value) => {
             value = await this._beforeParse(value);
 
-            if (value === undefined && !this._options.partial) {
-                return this._getDefaultValue();
-            }
-
-            if (value !== undefined && value !== null) {
+            if (value === undefined) {
+                if (this._options.partial) {
+                    return undefined;
+                } else {
+                    return this._getDefaultValue();
+                }
+            } else if (value !== null) {
                 value = await originalParse.apply(this, [value]);
             }
 
@@ -49,9 +51,12 @@ export class BaseField {
         return new ThisClass(this._options);
     }
 
-    public _asChild(parent: BaseField, fieldName: string) {
+    public _asChild(parent: BaseField, fieldName: string, options: BaseFieldOptions = {}) {
         this._parent = parent;
         this._fieldName = fieldName;
+        // @ts-ignore
+        this._options = { ...this._options, ...options };
+        console.log(this._options, this._fieldName)
     }
 
     public _getFieldName(): string {
