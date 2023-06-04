@@ -6,9 +6,9 @@ It gives you the following, a bundle I've found missing for TypeScript/Node:
 - Class-based schemas that serialize *and* deserialize:
   - Parse/validate JSON to internal objects
   - Format internal objects to JSON
-- Fields attached to schemas as class properties
 - Static types by default without an additional `infer` call
 - Custom validation by adding methods to a schema class
+- Simple way to access additional context (eg the request object) when parsing
 - Async parsing & formatting to play nice with ORMs
 - An API broadly similar to OpenAPI and JSON Schema
 
