@@ -45,6 +45,32 @@ VS Code:
 
 ![Alt Text](vs-code-demo-1.gif)
 
+<!-- TOC -->
+
+- [Introduction](#introduction)
+- [Installation](#installation)
+    - [From npm](#from-npm)
+    - [Config](#config)
+- [Basic Usage](#basic-usage)
+    - [Parsing & Validating Objects](#parsing--validating-objects)
+    - [Formatting Objects](#formatting-objects)
+- [Fields](#fields)
+    - [StringField: string](#stringfield-string)
+    - [BooleanField: boolean](#booleanfield-boolean)
+    - [NumberField: number](#numberfield-number)
+    - [DateTimeField: Date](#datetimefield-date)
+    - [ArrayField: Array<T>](#arrayfield-arrayt)
+    - [Nested Objects: DTObject](#nested-objects-dtobject)
+- [Error Handling](#error-handling)
+- [Custom Parsing/Validation](#custom-parsingvalidation)
+- [Custom Formatting](#custom-formatting)
+- [Recursive Objects](#recursive-objects)
+- [Standalone Fields](#standalone-fields)
+- [NestJS](#nestjs)
+    - [Simple Validation Pipe](#simple-validation-pipe)
+    - [Validation Pipe with Request Context](#validation-pipe-with-request-context)
+
+<!-- /TOC -->
 
 # Installation
 
