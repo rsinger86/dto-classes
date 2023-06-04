@@ -515,9 +515,9 @@ pastOrPresentSchema.parseValue('2015-10-23');
 
 Two ready-to-use examples are included.
 
-## Simple
+## Simple Pipe
 
-Copy the pipe in (nestjs-examples/dto-validation-pipe.ts)[nestjs-examples/dto-validation-pipe.ts] to your project.
+Copy the pipe in [nestjs-examples/dto-validation-pipe.ts](nestjs-examples/dto-validation-pipe.ts) to your project.
 
 ```typescript
 async function bootstrap() {
@@ -528,11 +528,11 @@ async function bootstrap() {
 bootstrap();
 ```
 
-## Access Request 
+## Pipe with Request Context
 
 To implement more complex validation it's often useful to be able to access the current HTTP request object. For example, knowing the current user could affect whether validation succeeds. Or maybe you want to implement a hidden field that always returns the current user.
 
-Copy the pipe in (nestjs-examples/dto-context-validation-pipe.ts)[nestjs-examples/dto-context-validation-pipe.ts] to your project.
+Copy the pipe in [nestjs-examples/dto-context-validation-pipe.ts](nestjs-examples/dto-context-validation-pipe.ts) to your project.
 
 Each request will construct its own pipe with the current request object so the pipe must be configured as a provider:
 
