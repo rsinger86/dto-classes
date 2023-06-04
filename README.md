@@ -515,7 +515,7 @@ pastOrPresentSchema.parseValue('2015-10-23');
 
 Two ready-to-use examples are included.
 
-## Simple Pipe
+## Simple Validation Pipe
 
 Copy the pipe in [nestjs-examples/dto-validation-pipe.ts](nestjs-examples/dto-validation-pipe.ts) to your project.
 
@@ -528,7 +528,7 @@ async function bootstrap() {
 bootstrap();
 ```
 
-## Pipe with Request Context
+## Validation Pipe with Request Context
 
 To implement more complex validation it's often useful to be able to access the current HTTP request object. For example, knowing the current user could affect whether validation succeeds. Or maybe you want to implement a hidden field that always returns the current user.
 
@@ -550,7 +550,31 @@ Each request will construct its own pipe with the current request object so the 
   ],
 })
 export class AppModule { }
-
 ```
 
+You can now easily set up a hidden input field that always returns the authenticated user of the request:
 
+```typescript
+import { BaseField, BaseFieldOptions, ParseReturnType } from 'dto-classes';
+import { User } from 'path-to-entities/user.entity';
+
+
+export class CurrentUserField<T extends BaseFieldOptions> extends BaseField {
+    _options: T;
+
+    constructor(options?: T) {
+        super(options);
+        this._options.ignoreInput = true;
+    }
+
+    public async parseValue(value: any): ParseReturnType<User, T> {
+        return this.getDefaultParseValue();
+    }
+
+    async getDefaultParseValue(): Promise<any> {
+        const user = await this._context.request.fetchUser();
+        return user;
+    }
+}
+
+```
