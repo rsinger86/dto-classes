@@ -15,12 +15,7 @@ It gives you the following, a bundle I've found missing for TypeScript/Node:
 Example:
 
 ```typescript
-import { Format } from "dto-classes/decorators";
-import { DTObject } from "dto-classes/dt-object";
-import { ArrayField } from "dto-classes/array-field";
-import { StringField } from "dto-classes/string-field";
-import { DateTimeField } from "dto-classes/date-time-field";
-
+import { DTObject, ArrayField, BooleanField, StringField, DateTimeField } from "dto-classes";
 
 class UserDto extends DTObject {
     firstName = StringField.bind()
