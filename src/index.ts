@@ -6,6 +6,7 @@ export { BooleanField } from "./fields/boolean-field";
 export { DateTimeField, DateTimeFieldOptions } from "./fields/date-time-field";
 export { StringField, StringOptions } from "./fields/string-field";
 export { NumberField, NumberOptions } from "./fields/number-field";
+export { CombineField, CombineOptions } from "./fields/combine-field";
 export { Recursive } from "./recursive";
 export { ParseError as ParseError } from "./exceptions/parse-error";
 export { ParseIssue as ValidationIssue } from "./exceptions/parse-issue";

@@ -2,7 +2,7 @@ import { getAllPropertyNames } from "../utils";
 import { ParseError } from "../exceptions/parse-error";
 import { ParseIssue } from "../exceptions/parse-issue";
 import { BeforeParse, IS_POST_PARSER_KEY, IS_PREPARSER_KEY, POST_PARSER_OPTIONS_KEY, ValidateMethodOptions } from "../decorators";
-import { ParseReturnType } from "../types";
+import { StaticBindReturnType } from "../types";
 
 
 export interface BaseFieldOptions {
@@ -181,11 +181,7 @@ export class BaseField {
         this: T,
         args?: C
     ):
-        Awaited<
-            C extends { items: any } ?
-            ParseReturnType<Array<C['items']>, C> :
-            ParseReturnType<ReturnType<InstanceType<T>['parseValue']>, C>
-        > {
+        Awaited<StaticBindReturnType<T, C>> {
         return new this(args ?? {} as any) as any;
     }
 
@@ -196,8 +192,7 @@ export class BaseField {
         this: T,
         data: any,
         args?: C
-    ): Promise<C extends { items: any } ? ParseReturnType<Array<C['items']>, C> :
-        ParseReturnType<ReturnType<InstanceType<T>['parseValue']>, C>> {
+    ): Promise<StaticBindReturnType<T, C>> {
         const instance = new this(args ?? {} as any) as any;
         return await instance.parseValue(data);
     }
