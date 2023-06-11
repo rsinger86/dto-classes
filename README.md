@@ -330,8 +330,6 @@ class UserDto extends DTObject {
 
 Fields or objects can be composed together, using JSON Schema's `oneOf` or `anyOf` to parse & validate with `OR` or `XOR` logic. That is, the input must match *at least one* (`anyOf`) or *exactly* one (`oneOf`) of the specified sub-fields.
 
-- Parses and formats a list of fields or nested objects.
-
 ```typescript
 interface CombineField extends BaseFieldOptions {
     anyOf?: Array<BaseField | DTObject>;
