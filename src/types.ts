@@ -28,7 +28,6 @@ export type StaticBindReturnType<
 > = O extends { items: any } ? ParseArrayReturnType<O> :
     O extends { oneOf: any } ? ParseOneOfReturnType<O> :
     O extends { anyOf: any } ? ParseAnyOfReturnType<O> :
-    O extends { allOf: any } ? ParseAllOfReturnType<O> :
     ParseReturnType<ReturnType<InstanceType<T>['parseValue']>, O>;
 
 
@@ -52,14 +51,9 @@ export type ParseAnyOfReturnType<
     T extends BaseFieldOptions & { anyOf: unknown[] }
 > = ParseReturnType<ArrayElement<T['anyOf']>, T>;
 
-export type ParseAllOfReturnType<
-    T extends BaseFieldOptions & { allOf: unknown[] }
-> = ParseReturnType<UnionToIntersection<T['allOf']>, T>;
-
 
 export type ParseCombineReturnType<O extends BaseFieldOptions> =
     Promise<O extends { oneOf: any } ? ParseOneOfReturnType<O> :
-        O extends { anyOf: any } ? ParseAnyOfReturnType<O> :
-        O extends { allOf: any } ? ParseAllOfReturnType<O> : never>;
+        O extends { anyOf: any } ? ParseAnyOfReturnType<O> : never>;
 
 export type ParseDtoReturnType<T> = Promise<Omit<T, InternalMethods>>;
