@@ -1,5 +1,5 @@
 import { ArrayOptions } from "./fields/array-field";
-import { BaseFieldOptions } from "./fields/base-field";
+import { BaseField, BaseFieldOptions } from "./fields/base-field";
 
 type InternalMethods = '_getParent' |
     '_asChild' |
@@ -16,7 +16,21 @@ type DeepPartial<T> = T extends object ? {
 
 type PartialPromise<T> = Partial<T>;
 
-type PartialIfOptionSet<T, O extends BaseFieldOptions> = O extends { partial: true } ? PartialPromise<T> : T;
+
+export type ArrayElement<ArrayType extends readonly unknown[]> =
+    ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
+
+
+export type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends ((k: infer I) => void) ? I : never
+
+export type StaticBindReturnType<
+    T extends typeof BaseField, O extends BaseFieldOptions
+> = O extends { items: any } ? ParseArrayReturnType<O> :
+    O extends { oneOf: any } ? ParseOneOfReturnType<O> :
+    O extends { anyOf: any } ? ParseAnyOfReturnType<O> :
+    O extends { allOf: any } ? ParseAllOfReturnType<O> :
+    ParseReturnType<ReturnType<InstanceType<T>['parseValue']>, O>;
+
 
 export type ParseReturnType<T, O extends BaseFieldOptions> =
     Promise<
@@ -30,6 +44,22 @@ export type ParseReturnType<T, O extends BaseFieldOptions> =
 
 export type ParseArrayReturnType<T extends ArrayOptions> = ParseReturnType<Array<T['items']>, T>;
 
+export type ParseOneOfReturnType<
+    T extends BaseFieldOptions & { oneOf: unknown[] }
+> = ParseReturnType<ArrayElement<T['oneOf']>, T>;
 
+export type ParseAnyOfReturnType<
+    T extends BaseFieldOptions & { anyOf: unknown[] }
+> = ParseReturnType<ArrayElement<T['anyOf']>, T>;
+
+export type ParseAllOfReturnType<
+    T extends BaseFieldOptions & { allOf: unknown[] }
+> = ParseReturnType<UnionToIntersection<T['allOf']>, T>;
+
+
+export type ParseCombineReturnType<O extends BaseFieldOptions> =
+    Promise<O extends { oneOf: any } ? ParseOneOfReturnType<O> :
+        O extends { anyOf: any } ? ParseAnyOfReturnType<O> :
+        O extends { allOf: any } ? ParseAllOfReturnType<O> : never>;
 
 export type ParseDtoReturnType<T> = Promise<Omit<T, InternalMethods>>;
