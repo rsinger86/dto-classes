@@ -18,8 +18,7 @@ Example:
 import { DTObject, ArrayField, BooleanField, StringField, DateTimeField } from "dto-classes";
 
 class UserDto extends DTObject {
-    firstName = StringField.bind()
-    lastName = StringField.bind()
+    name = StringField.bind()
     nickName = StringField.bind({ required: false })
     birthday = DateTimeField.bind()
     active = BooleanField.bind({ default: true })
@@ -28,8 +27,7 @@ class UserDto extends DTObject {
 }
 
 const userDto = await UserDto.parse({
-    firstName: "Michael",
-    lastName: "Scott",
+    name: "Michael Scott",
     birthday: '1962-08-16',
     hobbies: ["Comedy", "Paper"],
     favoriteColor: "Red"
@@ -45,6 +43,7 @@ VS Code:
 <!-- TOC -->
 
 - [Introduction](#introduction)
+- [Table of Contents](#table-of-contents)
 - [Installation](#installation)
     - [From npm](#from-npm)
     - [Config](#config)
@@ -57,6 +56,7 @@ VS Code:
     - [NumberField: number](#numberfield-number)
     - [DateTimeField: Date](#datetimefield-date)
     - [ArrayField: Array<T>](#arrayfield-arrayt)
+    - [CombineField: oneOf, anyOf](#combinefield-oneof-anyof)
     - [Nested Objects: DTObject](#nested-objects-dtobject)
 - [Error Handling](#error-handling)
 - [Custom Parsing/Validation](#custom-parsingvalidation)
@@ -323,6 +323,64 @@ class ActionDto extends DTObject {
 class UserDto extends DTObject {
     actions = ArrayField.bind({ items: ActionDto.bind() })
     emailAddresses = ArrayField.bind({ items: StringField.bind() })
+}
+```
+
+## CombineField: `oneOf`, `anyOf`
+
+Fields or objects can be composed together, using JSON Schema's `oneOf` or `anyOf` to parse & validate with `OR` or `XOR` logic. That is, the input must match *at least one* (`anyOf`) or *exactly* one (`oneOf`) of the specified sub-fields.
+
+- Parses and formats a list of fields or nested objects.
+
+```typescript
+interface CombineField extends BaseFieldOptions {
+    anyOf?: Array<BaseField | DTObject>;
+    oneOf?: Array<BaseField | DTObject>;
+}
+```
+
+| Option      | Description                                                  | Default |
+| ----------- | ---------------------------------------------------------------- | --- |
+| anyOf   | The supplied data must be valid against any (one or more) of the given subschemas. | n/a |
+| oneOf   | The supplied data must be valid against exactly one of the given subschemas. | n/a |
+
+**Example: `oneOf`**
+
+```typescript
+import { CombineField } from "dto-classes";
+
+// friendSchema must match a person or dog object, but not both
+
+class Person extends DTObject {
+    name = StringField.bind()
+    hasTwoLegs = BooleanField.bind()
+}
+
+class Dog extends DTObject {
+    name = StringField.bind()
+    hasFourLegs = BooleanField.bind()
+}
+
+const friendSchema = new CombineField({
+    oneOf: [
+        Person.bind(),
+        Dog.bind()
+    ]
+});
+```
+
+**Example: `anyOf`**
+
+```typescript
+// Quantity must be between 1-5 or 50-100
+
+class InventoryItem extends DTObject {
+    quantity = CombineField.bind({
+        anyOf: [
+            NumberField.bind({ minValue: 1, maxValue: 5 }),
+            NumberField.bind({ minValue: 50, maxValue: 100 })
+        ]
+    })
 }
 ```
 

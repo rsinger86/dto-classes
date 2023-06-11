@@ -5,17 +5,25 @@ import { ParseError } from "../exceptions/parse-error";
 import { ParseIssue } from "../exceptions/parse-issue";
 
 
-export interface CombineFieldOptions extends BaseFieldOptions {
+export interface CombineOptions extends BaseFieldOptions {
     readonly oneOf?: unknown[];
     readonly anyOf?: unknown[];
 }
 
-export class CombineField<T extends CombineFieldOptions = CombineFieldOptions> extends BaseField {
+export class CombineField<T extends CombineOptions = CombineOptions> extends BaseField {
     // @ts-ignore
     _options: T;
 
     constructor(options?: T) {
         super(options);
+
+        const errorMsg = 'When using CombineField, must set `anyOf` or `oneOf`, but not both.';
+
+        if (!this._options.anyOf && !this._options.oneOf) {
+            throw Error(errorMsg)
+        } else if (this._options.anyOf && this._options.oneOf) {
+            throw Error(errorMsg)
+        }
     }
 
     protected validateNull(value: any) {
